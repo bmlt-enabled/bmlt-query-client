@@ -1,35 +1,28 @@
-/// <reference types="vitest/config" />
-
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
 
+// ES Module build for direct browser import via <script type="module">
 export default defineConfig({
-  plugins: [dts()],
+  plugins: [
+    dts({
+      outDir: 'dist',
+      insertTypesEntry: true,
+      rollupTypes: true
+    })
+  ],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'BmltQueryClient',
-      fileName: (format) => `index.${format}.js`,
-      formats: ['es', 'cjs']
+      fileName: () => 'app.js',
+      formats: ['es']
     },
-    rollupOptions: {
-      external: ['axios', 'p-retry', 'p-queue'],
-      output: {
-        globals: {
-          axios: 'axios',
-          'p-retry': 'pRetry',
-          'p-queue': 'PQueue'
-        }
-      }
-    },
+    outDir: 'dist',
     sourcemap: true,
-    target: 'es2020'
-  },
-  test: {
-    environment: 'node',
-    globals: true,
-    timeout: 30000,
-    setupFiles: ['./test/setup.ts']
+    target: 'es2020',
+    rollupOptions: {
+      // Don't externalize any dependencies - bundle everything for browser use
+      external: []
+    }
   }
 });
