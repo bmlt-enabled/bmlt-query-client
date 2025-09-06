@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMLT Query Client - ES Module Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .results {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .meeting {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .meeting h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .meeting-info {
+            font-size: 14px;
+            color: #666;
+        }
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .stats {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏛️ BMLT Query Client - ES Module Demo</h1>
+    <p style="text-align: center;">
+        <strong>Using ES Modules directly in the browser!</strong><br>
+        <code>&lt;script type="module" src="./dist/index.esm.js"&gt;&lt;/script&gt;</code><br>
+        Live demo using the NYC BMLT server: <code>https://latest.aws.bmlt.app/main_server</code>
+    </p>
+
+    <div class="container">
+        <!-- Search Panel -->
+        <div class="panel">
+            <h2>🔍 Search Meetings</h2>
+            
+            <div class="controls">
+                <h3>Search by Address</h3>
+                <input type="text" id="addressInput" placeholder="e.g., Times Square, New York, NY" value="Times Square, New York, NY">
+                <input type="number" id="radiusInput" placeholder="Radius in miles" value="2" min="0.5" max="50" step="0.5">
+                <button class="btn" onclick="searchByAddress()">Search Nearby Meetings</button>
+            </div>
+
+            <div class="controls">
+                <h3>Quick Searches</h3>
+                <button class="btn" onclick="searchVirtualMeetings()">Virtual Meetings</button>
+                <button class="btn" onclick="searchTodaysMeetings()">Today's Meetings</button>
+                <button class="btn" onclick="searchWeekendMeetings()">Weekend Meetings</button>
+                <button class="btn" onclick="searchEveningMeetings()">Evening Meetings</button>
+            </div>
+
+            <div class="controls">
+                <h3>Server Info</h3>
+                <button class="btn" onclick="getServerInfo()">Get Server Info</button>
+                <button class="btn" onclick="getFormats()">Get Meeting Formats</button>
+                <button class="btn" onclick="getServiceBodies()">Get Service Bodies</button>
+            </div>
+
+            <div class="controls">
+                <h3>Geocoding Test</h3>
+                <input type="text" id="geocodeInput" placeholder="Address to geocode" value="Central Park, New York, NY">
+                <button class="btn" onclick="testGeocode()">Geocode Address</button>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="panel">
+            <h2>📋 Results</h2>
+            <div id="status"></div>
+            <div id="results" class="results">
+                <p style="text-align: center; color: #666;">
+                    Click a search button to see results...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the BMLT Query Client ES Module
+        import { 
+            BmltClient, 
+            Weekday, 
+            VenueType, 
+            MeetingQueryBuilder, 
+            QuickSearch 
+        } from 'https://cdn.aws.bmlt.app/app.js';
+
+        // Initialize the client with NYC demo server
+        const client = new BmltClient({
+            rootServerURL: 'https://latest.aws.bmlt.app/main_server'
+        });
+
+        // Make utilities available globally for the demo functions
+        window.client = client;
+        window.Weekday = Weekday;
+        window.VenueType = VenueType;
+        window.MeetingQueryBuilder = MeetingQueryBuilder;
+        window.QuickSearch = QuickSearch;
+
+        // Utility functions
+        window.setStatus = function(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = `<div class="${type}">${message}</div>`;
+        };
+
+        window.setResults = function(content) {
+            document.getElementById('results').innerHTML = content;
+        };
+
+        window.formatMeeting = function(meeting) {
+            const venueType = meeting.venue_type == 1 ? 'In-Person' : 
+                            meeting.venue_type == 2 ? 'Virtual' : 'Hybrid';
+            const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][parseInt(meeting.weekday_tinyint) - 1];
+            const distance = meeting.distance_in_miles ? 
+                           ` (${parseFloat(meeting.distance_in_miles).toFixed(1)} miles)` : '';
+            
+            return `
+                <div class="meeting">
+                    <h4>${meeting.meeting_name}${distance}</h4>
+                    <div class="meeting-info">
+                        📅 ${dayName} at ${meeting.start_time}<br>
+                        📍 ${meeting.location_text}<br>
+                        🏢 ${venueType}<br>
+                        ${meeting.virtual_meeting_link ? `🔗 <a href="${meeting.virtual_meeting_link}" target="_blank">Join Virtual Meeting</a><br>` : ''}
+                        ${meeting.comments ? `💬 ${meeting.comments}<br>` : ''}
+                    </div>
+                </div>
+            `;
+        };
+
+        // Search functions (all in the ES module context for async/await support)
+        window.searchByAddress = async function() {
+            const address = document.getElementById('addressInput').value;
+            const radius = parseFloat(document.getElementById('radiusInput').value);
+            
+            if (!address.trim()) {
+                setStatus('❌ Please enter an address', 'error');
+                return;
+            }
+
+            setStatus('🔍 Searching for meetings near ' + address + '...', 'loading');
+            
+            try {
+                const meetings = await client.searchMeetingsByAddress({
+                    address: address,
+                    radiusMiles: radius,
+                    sortByDistance: true,
+                    searchParams: { page_size: 10 }
+                });
+
+                if (meetings.length === 0) {
+                    setResults('<p>No meetings found in this area. Try a different location or larger radius.</p>');
+                    setStatus(`🤷 No meetings found near "${address}" within ${radius} miles`, 'error');
+                } else {
+                    const html = meetings.map(formatMeeting).join('');
+                    setResults(html);
+                    setStatus(`✅ Found ${meetings.length} meetings near "${address}"`, 'success');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+                setResults('<p>Search failed. Check console for details.</p>');
+            }
+        };
+
+        window.searchVirtualMeetings = async function() {
+            setStatus('🔍 Searching for virtual meetings...', 'loading');
+            
+            try {
+                const meetings = await client.searchMeetings({
+                    venue_types: VenueType.VIRTUAL,
+                    page_size: 15
+                });
+
+                if (meetings.length === 0) {
+                    setResults('<p>No virtual meetings found.</p>');
+                    setStatus('🤷 No virtual meetings found', 'error');
+                } else {
+                    const html = meetings.map(formatMeeting).join('');
+                    setResults(html);
+                    setStatus(`✅ Found ${meetings.length} virtual meetings`, 'success');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.searchTodaysMeetings = async function() {
+            setStatus('🔍 Searching for today\'s meetings...', 'loading');
+            
+            try {
+                const quickSearch = new QuickSearch(client);
+                const meetings = await quickSearch.today().paginate(15, 1).execute();
+
+                if (meetings.length === 0) {
+                    setResults('<p>No meetings found for today.</p>');
+                    setStatus('🤷 No meetings found for today', 'error');
+                } else {
+                    const html = meetings.map(formatMeeting).join('');
+                    setResults(html);
+                    setStatus(`✅ Found ${meetings.length} meetings for today`, 'success');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.searchWeekendMeetings = async function() {
+            setStatus('🔍 Searching for weekend meetings...', 'loading');
+            
+            try {
+                const quickSearch = new QuickSearch(client);
+                const meetings = await quickSearch.weekend().paginate(15, 1).execute();
+
+                if (meetings.length === 0) {
+                    setResults('<p>No weekend meetings found.</p>');
+                    setStatus('🤷 No weekend meetings found', 'error');
+                } else {
+                    const html = meetings.map(formatMeeting).join('');
+                    setResults(html);
+                    setStatus(`✅ Found ${meetings.length} weekend meetings`, 'success');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.searchEveningMeetings = async function() {
+            setStatus('🔍 Searching for evening meetings...', 'loading');
+            
+            try {
+                const quickSearch = new QuickSearch(client);
+                const meetings = await quickSearch.evening().paginate(15, 1).execute();
+
+                if (meetings.length === 0) {
+                    setResults('<p>No evening meetings found.</p>');
+                    setStatus('🤷 No evening meetings found', 'error');
+                } else {
+                    const html = meetings.map(formatMeeting).join('');
+                    setResults(html);
+                    setStatus(`✅ Found ${meetings.length} evening meetings`, 'success');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.getServerInfo = async function() {
+            setStatus('🔍 Getting server information...', 'loading');
+            
+            try {
+                const serverInfo = await client.getServerInfo();
+                
+                let html = '<h3>🖥️ Server Information</h3>';
+                if (Array.isArray(serverInfo)) {
+                    const info = serverInfo[0];
+                    html += `
+                        <p><strong>Version:</strong> ${info.version}</p>
+                        <p><strong>Server:</strong> ${client.getRootServerURL()}</p>
+                        <div class="stats">Raw response: ${JSON.stringify(info, null, 2)}</div>
+                    `;
+                } else {
+                    html += `<pre>${JSON.stringify(serverInfo, null, 2)}</pre>`;
+                }
+                
+                setResults(html);
+                setStatus('✅ Server information retrieved', 'success');
+            } catch (error) {
+                console.error('Server info error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.getFormats = async function() {
+            setStatus('🔍 Getting meeting formats...', 'loading');
+            
+            try {
+                const formats = await client.getFormats();
+                
+                let html = '<h3>📋 Meeting Formats</h3>';
+                formats.slice(0, 10).forEach(format => {
+                    html += `
+                        <div class="meeting">
+                            <h4>${format.key_string} - ${format.name_string}</h4>
+                            <div class="meeting-info">${format.description_string || 'No description available'}</div>
+                        </div>
+                    `;
+                });
+                
+                if (formats.length > 10) {
+                    html += `<p><em>Showing first 10 of ${formats.length} formats</em></p>`;
+                }
+                
+                setResults(html);
+                setStatus(`✅ Found ${formats.length} meeting formats`, 'success');
+            } catch (error) {
+                console.error('Formats error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.getServiceBodies = async function() {
+            setStatus('🔍 Getting service bodies...', 'loading');
+            
+            try {
+                const serviceBodies = await client.getServiceBodies();
+                
+                let html = '<h3>🏛️ Service Bodies</h3>';
+                serviceBodies.forEach(sb => {
+                    html += `
+                        <div class="meeting">
+                            <h4>${sb.name}</h4>
+                            <div class="meeting-info">
+                                Type: ${sb.type}<br>
+                                ${sb.description ? `Description: ${sb.description}<br>` : ''}
+                                ${sb.url ? `URL: <a href="${sb.url}" target="_blank">${sb.url}</a><br>` : ''}
+                                ID: ${sb.id}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                setResults(html);
+                setStatus(`✅ Found ${serviceBodies.length} service bodies`, 'success');
+            } catch (error) {
+                console.error('Service bodies error:', error);
+                setStatus('❌ Error: ' + error.message, 'error');
+            }
+        };
+
+        window.testGeocode = async function() {
+            const address = document.getElementById('geocodeInput').value;
+            
+            if (!address.trim()) {
+                setStatus('❌ Please enter an address to geocode', 'error');
+                return;
+            }
+
+            setStatus('🌍 Geocoding address: ' + address + '...', 'loading');
+            
+            try {
+                const result = await client.geocodeAddress(address);
+                
+                const html = `
+                    <h3>🌍 Geocoding Result</h3>
+                    <div class="meeting">
+                        <h4>📍 ${result.display_name}</h4>
+                        <div class="meeting-info">
+                            <strong>Coordinates:</strong> ${result.coordinates.latitude.toFixed(6)}, ${result.coordinates.longitude.toFixed(6)}<br>
+                            ${result.confidence ? `<strong>Confidence:</strong> ${(result.confidence * 100).toFixed(1)}%<br>` : ''}
+                            ${result.address ? `
+                                <strong>Address Components:</strong><br>
+                                ${Object.entries(result.address)
+                                  .filter(([key, value]) => value)
+                                  .map(([key, value]) => `${key}: ${value}`)
+                                  .join('<br>')
+                                }
+                            ` : ''}
+                        </div>
+                    </div>
+                    <p><em>🇺🇸 Using US region bias (default)</em></p>
+                `;
+                
+                setResults(html);
+                setStatus('✅ Address geocoded successfully', 'success');
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                setStatus('❌ Geocoding failed: ' + error.message, 'error');
+                setResults('<p>Geocoding failed. Address may not be found or service may be unavailable.</p>');
+            }
+        };
+
+        console.log('BMLT Query Client ES Module loaded successfully!');
+        setStatus('✅ BMLT Query Client ES Module initialized and ready!', 'success');
+    </script>
+
+    <!-- All functions are now defined in the ES module script above -->
+</body>
+</html>

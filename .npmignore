@@ -1,0 +1,33 @@
+# Source files
+src/
+tsconfig.json
+.eslintrc.js
+
+# Development files
+*.test.ts
+*.spec.ts
+jest.config.js
+.coverage/
+
+# Documentation (keep README.md)
+docs/
+examples/
+
+# Build tools
+.github/
+.vscode/
+.idea/
+
+# Logs and temp files
+logs/
+*.log
+tmp/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*

@@ -1,0 +1,138 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v5
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+#    - name: Run linting
+#      run: npm run lint
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Test project (when tests exist)
+      run: npm test
+      
+    - name: Check if build artifacts exist
+      run: |
+        if [ ! -f "dist/index.js" ]; then
+          echo "Build failed: dist/index.js not found"
+          exit 1
+        fi
+        echo "✅ Build successful - dist/index.js exists"
+        
+    - name: Test installation
+      run: |
+        npm pack
+        npm install -g ./bmlt-query-client-*.tgz
+        which bmlt-mcp-server || (echo "❌ Global install failed" && exit 1)
+        echo "✅ Global installation successful"
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '20.x'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Update version from tag
+      run: |
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        VERSION=${TAG_NAME#v}  # Remove 'v' prefix if present
+        echo "Setting version to: $VERSION"
+        
+        # Update version in package.json
+        npm version $VERSION --no-git-tag-version --allow-same-version
+        
+        # Show the updated package.json version
+        echo "Updated package.json version:"
+        npm version --json
+        
+    - name: Publish to npm
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
+    - name: Create GitHub Release Assets
+      run: |
+        npm pack
+        ls -la bmlt-query-client-*.tgz
+        
+    - name: Get package info
+      id: package
+      run: |
+        PACKAGE_FILE=$(ls bmlt-query-client-*.tgz | head -n1)
+        echo "filename=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+        echo "Package file: $PACKAGE_FILE"
+        
+    - name: Upload to GitHub Release
+      uses: ncipollo/release-action@v1.20.0
+      with:
+        artifacts: ${{ steps.package.outputs.filename }}
+        allowUpdates: true
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+
+  # Security audit job
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run security audit
+      run: npm audit --audit-level moderate
+      
+    - name: Check for outdated packages
+      run: npm outdated || true  # Don't fail on outdated packages, just warn
