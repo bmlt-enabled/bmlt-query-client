@@ -4,28 +4,28 @@ A modern TypeScript/JavaScript client for querying BMLT (Basic Meeting List Tool
 
 ## Features
 
-- 🚀 **Zero dependencies** - Uses native fetch API instead of axios
+- 🚀 **Zero dependencies** - Uses native fetch API
 - 🏛️ **Complete BMLT API coverage** - All semantic endpoints supported
 - 🌍 **Built-in geocoding** - Uses Nominatim for address-to-coordinates conversion
 - 🔍 **Fluent query builder** - Chainable API for complex meeting searches
 - ⚡ **Rate limiting & retry logic** - Stable operation with automatic retries
 - 📱 **Browser ready** - Works in all modern browsers via ES modules
 - 🎯 **TypeScript support** - Full type definitions included
-- 📦 **Multiple formats** - ES modules, CommonJS, and browser bundles
+- 📦 **ES Module format** - Single optimized browser-compatible build
 
 ## Quick Start
 
-### For Browser (ES Modules - Recommended)
+### For Browser (ES Modules)
 
 The easiest way to use the BMLT Query Client in the browser is via ES modules:
 
 ```html
 <script type="module">
   // Import directly from a CDN (when published)
-  import { BmltClient, VenueType, QuickSearch } from 'https://unpkg.com/bmlt-query-client/dist/index.esm.js';
+  import { BmltClient, VenueType, QuickSearch } from 'https://cdn.aws.bmlt.app/app.js';
   
   // Or import from your local build
-  // import { BmltClient, VenueType, QuickSearch } from './dist/index.esm.js';
+  // import { BmltClient, VenueType, QuickSearch } from './dist/app.js';
 
   // Initialize the client
   const client = new BmltClient({
@@ -82,13 +82,11 @@ const eveningMeetings = await builder
   .execute();
 ```
 
-## Bundle Sizes
+## Bundle Size
 
 The client has been optimized for minimal bundle size:
 
-- **ES Module**: ~55KB (15KB gzipped) - All dependencies included
-- **IIFE Bundle**: ~35KB (11KB gzipped) - For legacy browser support
-- **CommonJS/ESM (Node)**: ~31KB (8KB gzipped) - External dependencies
+- **ES Module**: ~55KB (15KB gzipped) - Zero external dependencies, fully self-contained
 
 ## Browser Support
 
@@ -205,8 +203,7 @@ try {
 
 ## Examples
 
-- **[ES Module Demo](./example-esm.html)** - Complete browser example using ES modules
-- **[Legacy Demo](./example.html)** - Browser example using IIFE bundle
+- **[Browser Demo](./docs/index.html)** - Complete browser example using ES modules
 
 ## Development
 
@@ -217,13 +214,17 @@ npm install
 # Run tests
 npm test
 
-# Build all formats
-npm run build:all
+# Build the ES module bundle
+npm run build
 
-# Build individual formats
-npm run build        # Node.js (ESM/CJS)
-npm run build:esm    # Browser ES module
-npm run build:browser # Browser IIFE bundle
+# Clean build directory
+npm run clean
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
 ```
 
 ## Configuration
