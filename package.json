@@ -15,9 +15,8 @@
   },
   "scripts": {
     "build": "vite build",
-    "build:browser": "vite build --config vite.browser.config.ts",
     "build:esm": "vite build --config vite.esm.config.ts",
-    "build:all": "npm run build && npm run build:browser && npm run build:esm",
+    "build:all": "npm run build && npm run build:esm",
     "dev": "vite build --watch",
     "test": "vitest",
     "test:ui": "vitest --ui",

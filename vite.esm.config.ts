@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      fileName: () => 'index.esm.js',
+      fileName: () => 'app.js',
       formats: ['es']
     },
     outDir: 'dist',

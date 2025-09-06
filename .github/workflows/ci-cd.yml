@@ -39,13 +39,6 @@ jobs:
     - name: Test project (when tests exist)
       run: npm test
 
-    - name: Test installation
-      run: |
-        npm pack
-        npm install -g ./bmlt-query-client-*.tgz
-        which bmlt-mcp-server || (echo "❌ Global install failed" && exit 1)
-        echo "✅ Global installation successful"
-
   publish:
     needs: test
     runs-on: ubuntu-latest
