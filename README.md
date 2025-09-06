@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/bmlt-query-client.svg)](https://badge.fury.io/js/bmlt-query-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18.0%2B-green.svg)](https://nodejs.org/)
+[![npm](https://img.shields.io/npm/v/bmlt-query-client.svg)](https://www.npmjs.com/package/bmlt-query-client)
 
 A modern TypeScript/JavaScript client for querying BMLT (Basic Meeting List Tool) servers with built-in geocoding support using the native fetch API.
 
