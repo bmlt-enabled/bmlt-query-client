@@ -1,17 +1,20 @@
 # BMLT Query Client - Project Complete! 🎉
 
 ## Overview
+
 A comprehensive TypeScript client for querying BMLT (Basic Meeting List Tool) servers with built-in geocoding support using Nominatim. Successfully replaces the broken `StringSearchIsAnAddress` functionality with reliable, rate-limited geocoding.
 
 ## ✅ Completed Features
 
 ### 🚀 Core Functionality
+
 - **Full TypeScript Support** - Complete type definitions for all BMLT API endpoints
 - **All BMLT Endpoints** - Complete coverage of the BMLT Semantic API
 - **Fluent Query Builder** - Chainable methods for complex searches
 - **Geographic Search** - Address-to-coordinate conversion with radius search
 
 ### 🌍 Geocoding Service
+
 - **Nominatim Integration** - OpenStreetMap-based geocoding
 - **US Region Bias** - Defaults to US (`countryCode: 'us'`)
 - **Custom Region Support** - Country codes and viewbox restrictions
@@ -20,13 +23,16 @@ A comprehensive TypeScript client for querying BMLT (Basic Meeting List Tool) se
 - **Retry Logic** - Exponential backoff with configurable retry counts
 
 ### 🛡️ Error Handling
+
 - **Comprehensive Error Types** - Specific error classes for different failures
 - **User-Friendly Messages** - Clean error messages for end users
 - **Retry Detection** - Automatic identification of retryable vs non-retryable errors
 - **Network Resilience** - Handles timeouts, network failures, and rate limits
 
 ### 📡 API Coverage
+
 All BMLT Semantic API endpoints:
+
 - `GetSearchResults` - Meeting searches with extensive filtering
 - `GetFormats` - Available meeting formats
 - `GetServiceBodies` - Service body hierarchy
@@ -38,6 +44,7 @@ All BMLT Semantic API endpoints:
 - `GetCoverageArea` - Geographic coverage
 
 ### 🧪 Testing & Examples
+
 - **Real NYC Demo Server** - All examples use `https://latest.aws.bmlt.app/main_server`
 - **Integration Tests** - Comprehensive test suite with real API calls
 - **Working Examples** - Complete usage examples with actual NYC data
@@ -80,14 +87,14 @@ import { BmltClient, Weekday, VenueType } from 'bmlt-query-client';
 
 // Initialize client with NYC demo server
 const client = new BmltClient({
-  rootServerURL: 'https://latest.aws.bmlt.app/main_server'
+  rootServerURL: 'https://latest.aws.bmlt.app/main_server',
 });
 
 // Search by address with automatic geocoding
 const meetings = await client.searchMeetingsByAddress({
   address: 'Times Square, New York, NY',
   radiusMiles: 2,
-  sortByDistance: true
+  sortByDistance: true,
 });
 
 // Use fluent query builder
@@ -119,11 +126,13 @@ const virtualMeetings = await new MeetingQueryBuilder(client)
 ## 📋 Next Steps
 
 ### Publishing to NPM
+
 1. Update author information in `package.json`
 2. Set up GitHub repository
 3. Run `npm publish` to release to NPM registry
 
 ### Optional Enhancements
+
 - Add caching layer for geocoding results
 - Support for additional geocoding providers
 - WebSocket support for real-time updates
@@ -152,6 +161,7 @@ npm run clean
 ## 📖 Documentation
 
 Complete documentation is available in `README.md` including:
+
 - Installation and setup instructions
 - Complete API reference
 - Working examples with NYC demo server

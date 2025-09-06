@@ -12,7 +12,7 @@ export enum BmltErrorType {
   AUTHENTICATION_ERROR = 'AuthenticationError',
   SERVER_ERROR = 'ServerError',
   CLIENT_ERROR = 'ClientError',
-  CONFIGURATION_ERROR = 'ConfigurationError'
+  CONFIGURATION_ERROR = 'ConfigurationError',
 }
 
 export class BmltQueryError extends Error {
@@ -59,7 +59,7 @@ export class BmltQueryError extends Error {
       BmltErrorType.NETWORK_ERROR,
       BmltErrorType.TIMEOUT_ERROR,
       BmltErrorType.RATE_LIMIT_ERROR,
-      BmltErrorType.SERVER_ERROR
+      BmltErrorType.SERVER_ERROR,
     ];
     return retryableTypes.includes(this.type);
   }
@@ -85,34 +85,34 @@ export class BmltQueryError extends Error {
     switch (this.type) {
       case BmltErrorType.NETWORK_ERROR:
         return 'Unable to connect to the BMLT server. Please check your internet connection and try again.';
-      
+
       case BmltErrorType.TIMEOUT_ERROR:
         return 'The request timed out. Please try again later.';
-      
+
       case BmltErrorType.RATE_LIMIT_ERROR:
         return 'Too many requests. Please wait a moment and try again.';
-      
+
       case BmltErrorType.GEOCODING_ERROR:
         return 'Unable to find the specified address. Please check the address and try again.';
-      
+
       case BmltErrorType.VALIDATION_ERROR:
         return 'Invalid input provided. Please check your parameters and try again.';
-      
+
       case BmltErrorType.AUTHENTICATION_ERROR:
         return 'Authentication failed. Please check your credentials.';
-      
+
       case BmltErrorType.SERVER_ERROR:
         return 'The BMLT server encountered an error. Please try again later.';
-      
+
       case BmltErrorType.API_ERROR:
         if (this.statusCode === 404) {
           return 'The requested resource was not found.';
         }
         return 'An error occurred while communicating with the BMLT server.';
-      
+
       case BmltErrorType.CONFIGURATION_ERROR:
         return 'Invalid configuration. Please check your settings.';
-      
+
       default:
         return this.message || 'An unexpected error occurred.';
     }
@@ -130,11 +130,13 @@ export class BmltQueryError extends Error {
       response: this.response,
       context: this.context,
       stack: this.stack,
-      originalError: this.originalError ? {
-        name: this.originalError.name,
-        message: this.originalError.message,
-        stack: this.originalError.stack
-      } : undefined
+      originalError: this.originalError
+        ? {
+            name: this.originalError.name,
+            message: this.originalError.message,
+            stack: this.originalError.stack,
+          }
+        : undefined,
     };
   }
 }
@@ -150,7 +152,7 @@ export class ErrorFactory {
     originalError?: Error
   ): BmltQueryError {
     let type: BmltErrorType;
-    
+
     if (statusCode) {
       if (statusCode >= 500) {
         type = BmltErrorType.SERVER_ERROR;
@@ -170,28 +172,25 @@ export class ErrorFactory {
     return new BmltQueryError(type, message, {
       statusCode,
       response,
-      originalError
+      originalError,
     });
   }
 
   static createNetworkError(message: string, originalError?: Error): BmltQueryError {
     return new BmltQueryError(BmltErrorType.NETWORK_ERROR, message, {
-      originalError
+      originalError,
     });
   }
 
   static createTimeoutError(message: string, originalError?: Error): BmltQueryError {
     return new BmltQueryError(BmltErrorType.TIMEOUT_ERROR, message, {
-      originalError
+      originalError,
     });
   }
 
-  static createValidationError(
-    message: string,
-    context?: Record<string, unknown>
-  ): BmltQueryError {
+  static createValidationError(message: string, context?: Record<string, unknown>): BmltQueryError {
     return new BmltQueryError(BmltErrorType.VALIDATION_ERROR, message, {
-      context
+      context,
     });
   }
 
@@ -202,7 +201,7 @@ export class ErrorFactory {
   ): BmltQueryError {
     return new BmltQueryError(BmltErrorType.GEOCODING_ERROR, message, {
       originalError,
-      context
+      context,
     });
   }
 
@@ -213,7 +212,7 @@ export class ErrorFactory {
   ): BmltQueryError {
     return new BmltQueryError(BmltErrorType.RATE_LIMIT_ERROR, message, {
       statusCode,
-      response
+      response,
     });
   }
 
@@ -222,7 +221,7 @@ export class ErrorFactory {
     context?: Record<string, unknown>
   ): BmltQueryError {
     return new BmltQueryError(BmltErrorType.CONFIGURATION_ERROR, message, {
-      context
+      context,
     });
   }
 }
@@ -257,7 +256,12 @@ export class ErrorHandler {
     }
 
     // Fallback for unknown errors
-    return ErrorFactory.createApiError('Unknown error occurred', undefined, undefined, new Error(String(error)));
+    return ErrorFactory.createApiError(
+      'Unknown error occurred',
+      undefined,
+      undefined,
+      new Error(String(error))
+    );
   }
 
   /**
@@ -277,16 +281,16 @@ export class ErrorHandler {
     constraints?: string[]
   ): BmltQueryError {
     let message = `Invalid ${field}: expected ${expectedType}`;
-    
+
     if (constraints && constraints.length > 0) {
       message += ` (${constraints.join(', ')})`;
     }
-    
+
     return ErrorFactory.createValidationError(message, {
       field,
       value,
       expectedType,
-      constraints
+      constraints,
     });
   }
 
@@ -297,7 +301,7 @@ export class ErrorHandler {
     const message = `Invalid endpoint/format combination: ${endpoint} with ${format}`;
     return ErrorFactory.createValidationError(message, {
       endpoint,
-      format
+      format,
     });
   }
 
@@ -308,7 +312,7 @@ export class ErrorHandler {
     const message = `Invalid URL: ${reason}`;
     return ErrorFactory.createValidationError(message, {
       url,
-      reason
+      reason,
     });
   }
 
@@ -324,7 +328,7 @@ export class ErrorHandler {
     return ErrorFactory.createValidationError(message, {
       latitude,
       longitude,
-      reason
+      reason,
     });
   }
 
@@ -337,7 +341,7 @@ export class ErrorHandler {
     additionalContext?: Record<string, unknown>
   ): BmltQueryError {
     const message = `${context}: ${originalError.message}`;
-    
+
     // Try to preserve the original error type if it's already a BmltQueryError
     if (originalError instanceof BmltQueryError) {
       return new BmltQueryError(originalError.type, message, {
@@ -346,8 +350,8 @@ export class ErrorHandler {
         originalError: originalError.originalError || originalError,
         context: {
           ...originalError.context,
-          ...additionalContext
-        }
+          ...additionalContext,
+        },
       });
     }
 
@@ -368,27 +372,19 @@ export interface RetryOptions {
 }
 
 export class RetryHandler {
-  static async withRetry<T>(
-    operation: () => Promise<T>,
-    options: RetryOptions
-  ): Promise<T> {
-    const {
-      maxRetries,
-      baseDelay,
-      maxDelay,
-      factor,
-      onRetry
-    } = options;
+  static async withRetry<T>(operation: () => Promise<T>, options: RetryOptions): Promise<T> {
+    const { maxRetries, baseDelay, maxDelay, factor, onRetry } = options;
 
     let lastError: BmltQueryError;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
       } catch (error) {
-        const bmltError = error instanceof BmltQueryError 
-          ? error 
-          : ErrorHandler.wrapError(error as Error, 'Operation failed');
+        const bmltError =
+          error instanceof BmltQueryError
+            ? error
+            : ErrorHandler.wrapError(error as Error, 'Operation failed');
 
         lastError = bmltError;
 
@@ -398,10 +394,7 @@ export class RetryHandler {
         }
 
         // Calculate delay for next attempt
-        const delay = Math.min(
-          baseDelay * Math.pow(factor, attempt),
-          maxDelay
-        );
+        const delay = Math.min(baseDelay * Math.pow(factor, attempt), maxDelay);
 
         // Call retry callback if provided
         if (onRetry) {

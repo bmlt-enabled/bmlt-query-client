@@ -24,33 +24,33 @@ import {
   NAWSDumpParams,
   GeocodeOptions,
   RateLimitOptions,
-  Coordinates
+  Coordinates,
 } from '../types';
 import {
   buildBmltURL,
   validateEndpointFormat,
   validateRootServerURL,
   validateCoordinates,
-  validateRadius
+  validateRadius,
 } from '../utils/url-builder';
 import { ErrorHandler } from '../utils/errors';
 
 export interface BmltClientOptions {
   /** Root server URL */
   rootServerURL: string;
-  
+
   /** Default data format */
   defaultFormat?: BmltDataFormat;
-  
+
   /** HTTP request timeout in milliseconds */
   timeout?: number;
-  
+
   /** User agent string */
   userAgent?: string;
-  
+
   /** Geocoding options */
   geocodingOptions?: GeocodeOptions & RateLimitOptions;
-  
+
   /** Enable automatic geocoding for address searches */
   enableGeocoding?: boolean;
 }
@@ -69,7 +69,7 @@ export class BmltClient {
       timeout = 30000,
       userAgent = 'bmlt-query-client/1.0.0',
       geocodingOptions = {},
-      enableGeocoding = true
+      enableGeocoding = true,
     } = options;
 
     // Validate and normalize root server URL
@@ -93,7 +93,7 @@ export class BmltClient {
     format: BmltDataFormat = this.defaultFormat
   ): Promise<T> {
     let response: Response | undefined;
-    
+
     try {
       // Validate endpoint/format combination
       validateEndpointFormat(endpoint, format);
@@ -103,7 +103,7 @@ export class BmltClient {
         rootServerURL: this.rootServerURL,
         format,
         endpoint,
-        parameters
+        parameters,
       });
 
       // Create abort controller for timeout
@@ -115,9 +115,9 @@ export class BmltClient {
         response = await fetch(url, {
           method: 'GET',
           headers: {
-            'User-Agent': this.userAgent
+            'User-Agent': this.userAgent,
           },
-          signal: controller.signal
+          signal: controller.signal,
         });
       } finally {
         clearTimeout(timeoutId);
@@ -126,7 +126,7 @@ export class BmltClient {
       // Check if response is ok
       if (!response.ok) {
         throw ErrorHandler.handleFetchError(
-          new Error(`HTTP ${response.status}: ${response.statusText}`), 
+          new Error(`HTTP ${response.status}: ${response.statusText}`),
           response
         );
       }
@@ -144,11 +144,11 @@ export class BmltClient {
         // Extract JSON from JSONP callback
         const callbackName = (parameters.callback as string) || 'callback';
         const jsonMatch = responseText.match(new RegExp(`${callbackName}\\((.+)\\);?$`));
-        
+
         if (!jsonMatch) {
           throw new Error('Invalid JSONP response format');
         }
-        
+
         return JSON.parse(jsonMatch[1]) as T;
       }
 
@@ -159,7 +159,6 @@ export class BmltClient {
 
       // Fallback - return as text
       return responseText as T;
-
     } catch (error) {
       throw ErrorHandler.handleFetchError(error, response);
     }
@@ -191,7 +190,7 @@ export class BmltClient {
       ...searchParams,
       lat_val: geocodeResult.coordinates.latitude,
       long_val: geocodeResult.coordinates.longitude,
-      sort_results_by_distance: sortByDistance
+      sort_results_by_distance: sortByDistance,
     };
 
     // Add radius parameter
@@ -213,7 +212,10 @@ export class BmltClient {
     coordinates: Coordinates,
     radiusMiles?: number,
     radiusKm?: number,
-    searchParams: Omit<SearchResultsParams, 'lat_val' | 'long_val' | 'geo_width' | 'geo_width_km'> = {}
+    searchParams: Omit<
+      SearchResultsParams,
+      'lat_val' | 'long_val' | 'geo_width' | 'geo_width_km'
+    > = {}
   ): Promise<Meeting[]> {
     validateCoordinates(coordinates.latitude, coordinates.longitude);
 
@@ -221,7 +223,7 @@ export class BmltClient {
       ...searchParams,
       lat_val: coordinates.latitude,
       long_val: coordinates.longitude,
-      sort_results_by_distance: true
+      sort_results_by_distance: true,
     };
 
     if (radiusMiles !== undefined) {
@@ -355,7 +357,7 @@ export class BmltClient {
 
     return {
       queueSize: this.geocodingService.getQueueSize(),
-      pendingCount: this.geocodingService.getPendingCount()
+      pendingCount: this.geocodingService.getPendingCount(),
     };
   }
 

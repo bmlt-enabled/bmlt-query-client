@@ -8,7 +8,7 @@ import { BmltClient, Weekday, VenueType, BmltQueryError } from '../src/index';
 describe('BMLT Query Client - Basic Tests', () => {
   const client = new BmltClient({
     rootServerURL: 'https://latest.aws.bmlt.app/main_server',
-    timeout: 15000 // 15 second timeout for tests
+    timeout: 15000, // 15 second timeout for tests
   });
 
   test('should get server info', async () => {
@@ -27,7 +27,7 @@ describe('BMLT Query Client - Basic Tests', () => {
     const formats = await client.getFormats();
     expect(Array.isArray(formats)).toBe(true);
     expect(formats.length).toBeGreaterThan(0);
-    
+
     if (formats.length > 0) {
       expect(formats[0]).toHaveProperty('id'); // API uses 'id' not 'shared_id_bigint'
       expect(formats[0]).toHaveProperty('key_string');
@@ -39,7 +39,7 @@ describe('BMLT Query Client - Basic Tests', () => {
     const serviceBodies = await client.getServiceBodies();
     expect(Array.isArray(serviceBodies)).toBe(true);
     expect(serviceBodies.length).toBeGreaterThan(0);
-    
+
     if (serviceBodies.length > 0) {
       expect(serviceBodies[0]).toHaveProperty('id');
       expect(serviceBodies[0]).toHaveProperty('name');
@@ -51,7 +51,7 @@ describe('BMLT Query Client - Basic Tests', () => {
     expect(Array.isArray(meetings)).toBe(true);
     expect(meetings.length).toBeGreaterThan(0);
     expect(meetings.length).toBeLessThanOrEqual(10);
-    
+
     if (meetings.length > 0) {
       const meeting = meetings[0];
       expect(meeting).toHaveProperty('id_bigint');
@@ -66,9 +66,9 @@ describe('BMLT Query Client - Basic Tests', () => {
   test('should search for virtual meetings', async () => {
     const virtualMeetings = await client.searchMeetings({
       venue_types: VenueType.VIRTUAL,
-      page_size: 5
+      page_size: 5,
     });
-    
+
     expect(Array.isArray(virtualMeetings)).toBe(true);
     virtualMeetings.forEach(meeting => {
       expect(meeting.venue_type).toBe(VenueType.VIRTUAL);
@@ -78,9 +78,9 @@ describe('BMLT Query Client - Basic Tests', () => {
   test('should search for meetings on specific weekdays', async () => {
     const mondayMeetings = await client.searchMeetings({
       weekdays: Weekday.MONDAY,
-      page_size: 5
+      page_size: 5,
     });
-    
+
     expect(Array.isArray(mondayMeetings)).toBe(true);
     mondayMeetings.forEach(meeting => {
       expect(parseInt(meeting.weekday_tinyint.toString())).toBe(Weekday.MONDAY);
@@ -89,7 +89,7 @@ describe('BMLT Query Client - Basic Tests', () => {
 
   test('should geocode a NYC address', async () => {
     const result = await client.geocodeAddress('Times Square, New York, NY');
-    
+
     expect(result).toBeDefined();
     expect(result.coordinates).toBeDefined();
     expect(result.coordinates.latitude).toBeCloseTo(40.758, 1);
@@ -101,9 +101,9 @@ describe('BMLT Query Client - Basic Tests', () => {
     const meetings = await client.searchMeetingsByAddress({
       address: 'Central Park, New York, NY',
       radiusMiles: 2,
-      searchParams: { page_size: 5 }
+      searchParams: { page_size: 5 },
     });
-    
+
     expect(Array.isArray(meetings)).toBe(true);
     meetings.forEach(meeting => {
       expect(meeting.distance_in_miles).toBeDefined();
@@ -113,12 +113,12 @@ describe('BMLT Query Client - Basic Tests', () => {
 
   test('should search meetings by coordinates', async () => {
     const meetings = await client.searchMeetingsByCoordinates(
-      { latitude: 40.7580, longitude: -73.9855 }, // Times Square
+      { latitude: 40.758, longitude: -73.9855 }, // Times Square
       1, // 1 mile radius
       undefined,
       { page_size: 5 }
     );
-    
+
     expect(Array.isArray(meetings)).toBe(true);
     meetings.forEach(meeting => {
       expect(meeting.distance_in_miles).toBeDefined();

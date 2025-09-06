@@ -6,7 +6,7 @@ export enum BmltDataFormat {
   JSON = 'json',
   JSONP = 'jsonp',
   TSML = 'tsml',
-  CSV = 'csv'
+  CSV = 'csv',
 }
 
 export enum BmltEndpoint {
@@ -18,7 +18,7 @@ export enum BmltEndpoint {
   GET_FIELD_VALUES = 'GetFieldValues',
   GET_NAWS_DUMP = 'GetNAWSDump',
   GET_SERVER_INFO = 'GetServerInfo',
-  GET_COVERAGE_AREA = 'GetCoverageArea'
+  GET_COVERAGE_AREA = 'GetCoverageArea',
 }
 
 export enum Weekday {
@@ -28,13 +28,13 @@ export enum Weekday {
   WEDNESDAY = 4,
   THURSDAY = 5,
   FRIDAY = 6,
-  SATURDAY = 7
+  SATURDAY = 7,
 }
 
 export enum VenueType {
   IN_PERSON = 1,
   VIRTUAL = 2,
-  HYBRID = 3
+  HYBRID = 3,
 }
 
 export enum SortKey {
@@ -42,7 +42,7 @@ export enum SortKey {
   TIME = 'time',
   TOWN = 'town',
   STATE = 'state',
-  WEEKDAY_STATE = 'weekday_state'
+  WEEKDAY_STATE = 'weekday_state',
 }
 
 export enum Language {
@@ -55,7 +55,7 @@ export enum Language {
   ITALIAN = 'it',
   POLISH = 'pl',
   PORTUGUESE = 'pt',
-  SWEDISH = 'sv'
+  SWEDISH = 'sv',
 }
 
 export interface Coordinates {

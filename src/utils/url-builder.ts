@@ -16,17 +16,17 @@ export interface URLBuilderOptions {
  */
 export function buildBmltURL(options: URLBuilderOptions): string {
   const { rootServerURL, format, endpoint, parameters = {} } = options;
-  
+
   // Ensure root server URL ends with slash
   const baseURL = rootServerURL.endsWith('/') ? rootServerURL : `${rootServerURL}/`;
-  
+
   // Build the base endpoint URL
   const endpointURL = `${baseURL}client_interface/${format}/`;
-  
+
   // Convert parameters to query string
   const queryParams = new URLSearchParams();
   queryParams.set('switcher', endpoint);
-  
+
   // Add other parameters
   Object.entries(parameters).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
@@ -44,7 +44,7 @@ export function buildBmltURL(options: URLBuilderOptions): string {
       }
     }
   });
-  
+
   return `${endpointURL}?${queryParams.toString()}`;
 }
 
@@ -53,7 +53,7 @@ export function buildBmltURL(options: URLBuilderOptions): string {
  */
 export function normalizeParameters(params: Record<string, unknown>): Record<string, unknown> {
   const normalized: Record<string, unknown> = {};
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       // Handle array parameters with positive/negative values
@@ -67,7 +67,7 @@ export function normalizeParameters(params: Record<string, unknown>): Record<str
           }
           return item;
         });
-      } 
+      }
       // Handle boolean parameters
       else if (typeof value === 'boolean') {
         normalized[key] = value;
@@ -87,7 +87,7 @@ export function normalizeParameters(params: Record<string, unknown>): Record<str
       }
     }
   });
-  
+
   return normalized;
 }
 
@@ -96,7 +96,11 @@ export function normalizeParameters(params: Record<string, unknown>): Record<str
  */
 export function validateEndpointFormat(endpoint: BmltEndpoint, format: BmltDataFormat): void {
   const validCombinations: Record<BmltEndpoint, BmltDataFormat[]> = {
-    [BmltEndpoint.GET_SEARCH_RESULTS]: [BmltDataFormat.JSON, BmltDataFormat.JSONP, BmltDataFormat.TSML],
+    [BmltEndpoint.GET_SEARCH_RESULTS]: [
+      BmltDataFormat.JSON,
+      BmltDataFormat.JSONP,
+      BmltDataFormat.TSML,
+    ],
     [BmltEndpoint.GET_FORMATS]: [BmltDataFormat.JSON, BmltDataFormat.JSONP],
     [BmltEndpoint.GET_SERVICE_BODIES]: [BmltDataFormat.JSON, BmltDataFormat.JSONP],
     [BmltEndpoint.GET_CHANGES]: [BmltDataFormat.JSON, BmltDataFormat.JSONP],
@@ -104,7 +108,7 @@ export function validateEndpointFormat(endpoint: BmltEndpoint, format: BmltDataF
     [BmltEndpoint.GET_FIELD_VALUES]: [BmltDataFormat.JSON, BmltDataFormat.JSONP],
     [BmltEndpoint.GET_NAWS_DUMP]: [BmltDataFormat.CSV],
     [BmltEndpoint.GET_SERVER_INFO]: [BmltDataFormat.JSON, BmltDataFormat.JSONP],
-    [BmltEndpoint.GET_COVERAGE_AREA]: [BmltDataFormat.JSON, BmltDataFormat.JSONP]
+    [BmltEndpoint.GET_COVERAGE_AREA]: [BmltDataFormat.JSON, BmltDataFormat.JSONP],
   };
 
   const validFormats = validCombinations[endpoint];
@@ -124,7 +128,7 @@ export function validateRootServerURL(url: string): string {
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
       throw new Error('Root server URL must use http or https protocol');
     }
-    
+
     // Return the URL without trailing slash for consistency
     return urlObj.href.replace(/\/$/, '');
   } catch (error) {
@@ -139,43 +143,47 @@ export function extractIds(value: unknown): number[] {
   if (typeof value === 'number') {
     return [value];
   }
-  
+
   if (typeof value === 'string') {
     // Handle comma-separated values
-    return value.split(',')
+    return value
+      .split(',')
       .map(id => parseInt(id.trim(), 10))
       .filter(id => !isNaN(id));
   }
-  
+
   if (Array.isArray(value)) {
     return value
-      .map(item => typeof item === 'number' ? item : parseInt(String(item), 10))
+      .map(item => (typeof item === 'number' ? item : parseInt(String(item), 10)))
       .filter(id => !isNaN(id));
   }
-  
+
   return [];
 }
 
 /**
  * Format time values for BMLT API
  */
-export function formatTimeValue(hours?: number, minutes?: number): { hours?: number; minutes?: number } {
+export function formatTimeValue(
+  hours?: number,
+  minutes?: number
+): { hours?: number; minutes?: number } {
   const result: { hours?: number; minutes?: number } = {};
-  
+
   if (typeof hours === 'number') {
     if (hours < 0 || hours > 23) {
       throw new Error('Hours must be between 0 and 23');
     }
     result.hours = hours;
   }
-  
+
   if (typeof minutes === 'number') {
     if (minutes < 0 || minutes > 59) {
       throw new Error('Minutes must be between 0 and 59');
     }
     result.minutes = minutes;
   }
-  
+
   return result;
 }
 
@@ -186,15 +194,15 @@ export function validateCoordinates(latitude: number, longitude: number): void {
   if (typeof latitude !== 'number' || isNaN(latitude)) {
     throw new Error('Latitude must be a valid number');
   }
-  
+
   if (typeof longitude !== 'number' || isNaN(longitude)) {
     throw new Error('Longitude must be a valid number');
   }
-  
+
   if (latitude < -90 || latitude > 90) {
     throw new Error('Latitude must be between -90 and 90 degrees');
   }
-  
+
   if (longitude < -180 || longitude > 180) {
     throw new Error('Longitude must be between -180 and 180 degrees');
   }
@@ -207,7 +215,7 @@ export function validateRadius(radius: number): void {
   if (typeof radius !== 'number' || isNaN(radius)) {
     throw new Error('Radius must be a valid number');
   }
-  
+
   if (radius <= 0) {
     throw new Error('Radius must be greater than 0');
   }

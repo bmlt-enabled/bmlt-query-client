@@ -28,26 +28,26 @@ The easiest way to use the BMLT Query Client in the browser is via ES modules:
 <script type="module">
   // Import directly from a CDN (when published)
   import { BmltClient, VenueType, QuickSearch } from 'https://cdn.aws.bmlt.app/app.js';
-  
+
   // Or import from your local build
   // import { BmltClient, VenueType, QuickSearch } from './dist/app.js';
 
   // Initialize the client
   const client = new BmltClient({
-    rootServerURL: 'https://latest.aws.bmlt.app/main_server'  // NYC demo server
+    rootServerURL: 'https://latest.aws.bmlt.app/main_server', // NYC demo server
   });
 
   // Search for virtual meetings
   const virtualMeetings = await client.searchMeetings({
     venue_types: VenueType.VIRTUAL,
-    page_size: 10
+    page_size: 10,
   });
 
   // Search meetings by address
   const nearbyMeetings = await client.searchMeetingsByAddress({
     address: 'Times Square, New York, NY',
     radiusMiles: 5,
-    searchParams: { page_size: 10 }
+    searchParams: { page_size: 10 },
   });
 
   // Use the fluent query builder
@@ -68,20 +68,20 @@ npm install bmlt-query-client
 import { BmltClient, VenueType, MeetingQueryBuilder } from 'bmlt-query-client';
 
 const client = new BmltClient({
-  rootServerURL: 'https://your-bmlt-server.org/main_server'
+  rootServerURL: 'https://your-bmlt-server.org/main_server',
 });
 
 // Search for meetings
 const meetings = await client.searchMeetings({
   weekdays: [1, 2, 3], // Sunday, Monday, Tuesday
-  venue_types: VenueType.IN_PERSON
+  venue_types: VenueType.IN_PERSON,
 });
 
 // Use the query builder for complex searches
 const builder = new MeetingQueryBuilder(client);
 const eveningMeetings = await builder
-  .onWeekdays(1, 2, 3, 4, 5)  // Weekdays
-  .startingAfter(17, 0)       // After 5 PM
+  .onWeekdays(1, 2, 3, 4, 5) // Weekdays
+  .startingAfter(17, 0) // After 5 PM
   .inPersonOnly()
   .nearCoordinates({ latitude: 40.7589, longitude: -73.9851 }, 2) // 2 mile radius
   .execute();
@@ -117,14 +117,14 @@ const formats = await client.getFormats();
 const serviceBodies = await client.getServiceBodies();
 
 // Field values
-const fieldValues = await client.getFieldValues({ 
-  meeting_key: 'location_municipality' 
+const fieldValues = await client.getFieldValues({
+  meeting_key: 'location_municipality',
 });
 
 // Changes within date range
 const changes = await client.getChanges({
   start_date: '2023-01-01',
-  end_date: '2023-01-31'
+  end_date: '2023-01-31',
 });
 ```
 
@@ -139,7 +139,7 @@ console.log(result.coordinates); // { latitude: 40.758, longitude: -73.985 }
 const meetings = await client.searchMeetingsByAddress({
   address: 'Central Park, New York',
   radiusMiles: 2,
-  sortByDistance: true
+  sortByDistance: true,
 });
 ```
 
@@ -152,11 +152,11 @@ const builder = new MeetingQueryBuilder(client);
 const meetings = await builder
   .onWeekdays(Weekday.SATURDAY, Weekday.SUNDAY)
   .virtualOnly()
-  .startingAfter(10, 0)  // After 10 AM
-  .endingBefore(20, 0)   // Before 8 PM
+  .startingAfter(10, 0) // After 10 AM
+  .endingBefore(20, 0) // Before 8 PM
   .searchText('meditation')
   .sortByDistance()
-  .paginate(20, 1)       // 20 results, page 1
+  .paginate(20, 1) // 20 results, page 1
   .execute();
 ```
 
@@ -175,7 +175,7 @@ const weekendMeetings = await quickSearch.weekend().execute();
 const todaysVirtualMeetings = await quickSearch
   .today()
   .virtualOnly()
-  .startingAfter(18, 0)  // After 6 PM
+  .startingAfter(18, 0) // After 6 PM
   .execute();
 ```
 
@@ -192,12 +192,12 @@ try {
   if (error instanceof BmltQueryError) {
     console.log('Error type:', error.type);
     console.log('User message:', error.getUserMessage());
-    
+
     if (error.isRetryable()) {
       // Handle retryable errors (network, timeout, rate limit)
       console.log('This error can be retried');
     }
-    
+
     if (error.isType(BmltErrorType.GEOCODING_ERROR)) {
       // Handle geocoding-specific errors
       console.log('Geocoding failed');
@@ -225,11 +225,13 @@ npm run build
 # Clean build directory
 npm run clean
 
-# Type checking
-npm run type-check
+# Code formatting
+npm run format        # Format all files
+npm run format:check  # Check formatting
 
-# Linting
-npm run lint
+# Code quality
+npm run lint          # Lint code
+npm run type-check    # TypeScript checking
 ```
 
 ## Configuration
@@ -239,15 +241,15 @@ npm run lint
 ```javascript
 const client = new BmltClient({
   rootServerURL: 'https://your-server.org/main_server', // Required
-  defaultFormat: BmltDataFormat.JSON,                   // Optional
-  timeout: 30000,                                       // 30 seconds
-  userAgent: 'my-app/1.0.0',                           // Custom user agent
-  enableGeocoding: true,                                // Enable address search
+  defaultFormat: BmltDataFormat.JSON, // Optional
+  timeout: 30000, // 30 seconds
+  userAgent: 'my-app/1.0.0', // Custom user agent
+  enableGeocoding: true, // Enable address search
   geocodingOptions: {
-    countryCode: 'us',    // Bias results to US
-    retryCount: 3,        // Retry failed requests
-    timeout: 10000        // Geocoding timeout
-  }
+    countryCode: 'us', // Bias results to US
+    retryCount: 3, // Retry failed requests
+    timeout: 10000, // Geocoding timeout
+  },
 });
 ```
 
@@ -257,15 +259,15 @@ const client = new BmltClient({
 const client = new BmltClient({
   rootServerURL: 'https://your-server.org/main_server',
   geocodingOptions: {
-    countryCode: 'us',                    // ISO country code bias
+    countryCode: 'us', // ISO country code bias
     viewbox: [-74.2, 40.4, -73.7, 40.9], // Geographic bounding box [w,s,e,n]
-    bounded: true,                        // Restrict to viewbox
-    retryCount: 3,                        // Request retry attempts
-    timeout: 10000,                       // Request timeout (ms)
-    intervalCap: 1,                       // Rate limit: requests per interval
-    interval: 1000,                       // Rate limit interval (ms)
-    concurrency: 1                        // Max concurrent requests
-  }
+    bounded: true, // Restrict to viewbox
+    retryCount: 3, // Request retry attempts
+    timeout: 10000, // Request timeout (ms)
+    intervalCap: 1, // Rate limit: requests per interval
+    interval: 1000, // Rate limit interval (ms)
+    concurrency: 1, // Max concurrent requests
+  },
 });
 ```
 

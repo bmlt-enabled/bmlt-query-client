@@ -36,7 +36,9 @@ export interface NominatimResponse {
 export class GeocodingService {
   private baseURL: string;
   private queue: PQueue;
-  private readonly defaultOptions: Required<Omit<GeocodeOptions, 'viewbox'>> & { viewbox?: [number, number, number, number] };
+  private readonly defaultOptions: Required<Omit<GeocodeOptions, 'viewbox'>> & {
+    viewbox?: [number, number, number, number];
+  };
 
   constructor(options: GeocodeOptions & RateLimitOptions = {}) {
     const {
@@ -59,7 +61,7 @@ export class GeocodingService {
       userAgent,
       countryCode,
       viewbox,
-      bounded
+      bounded,
     };
 
     this.baseURL = 'https://nominatim.openstreetmap.org';
@@ -69,7 +71,7 @@ export class GeocodingService {
       interval,
       concurrency,
       carryoverConcurrencyCount,
-      ...rateLimitOptions
+      ...rateLimitOptions,
     });
   }
 
@@ -84,9 +86,9 @@ export class GeocodingService {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'User-Agent': userAgent
+          'User-Agent': userAgent,
         },
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -134,7 +136,7 @@ export class GeocodingService {
   async geocode(address: string, options: Partial<GeocodeOptions> = {}): Promise<GeocodeResult> {
     const geocodeOptions = { ...this.defaultOptions, ...options };
 
-    return (this.queue.add(async (): Promise<GeocodeResult> => {
+    return this.queue.add(async (): Promise<GeocodeResult> => {
       return pRetry(
         async () => {
           try {
@@ -144,7 +146,7 @@ export class GeocodingService {
               format: 'json',
               addressdetails: 1,
               limit: 1,
-              dedupe: 1
+              dedupe: 1,
             };
 
             // Add country code bias if specified
@@ -183,18 +185,24 @@ export class GeocodingService {
             const result = response[0];
             const coordinates: Coordinates = {
               latitude: parseFloat(result.lat),
-              longitude: parseFloat(result.lon)
+              longitude: parseFloat(result.lon),
             };
 
             // Validate coordinates
             if (isNaN(coordinates.latitude) || isNaN(coordinates.longitude)) {
-              const error: BmltError = new Error('Invalid coordinates received from geocoding service');
+              const error: BmltError = new Error(
+                'Invalid coordinates received from geocoding service'
+              );
               error.name = 'GeocodingError';
               throw error;
             }
 
-            if (coordinates.latitude < -90 || coordinates.latitude > 90 ||
-                coordinates.longitude < -180 || coordinates.longitude > 180) {
+            if (
+              coordinates.latitude < -90 ||
+              coordinates.latitude > 90 ||
+              coordinates.longitude < -180 ||
+              coordinates.longitude > 180
+            ) {
               const error: BmltError = new Error('Coordinates out of valid range');
               error.name = 'GeocodingError';
               throw error;
@@ -204,19 +212,20 @@ export class GeocodingService {
               coordinates,
               display_name: result.display_name,
               confidence: result.importance,
-              address: result.address ? {
-                house_number: result.address.house_number,
-                road: result.address.road,
-                neighbourhood: result.address.neighbourhood,
-                suburb: result.address.suburb,
-                city: result.address.city || result.address.town || result.address.village,
-                county: result.address.county,
-                state: result.address.state,
-                postcode: result.address.postcode,
-                country: result.address.country
-              } : undefined
+              address: result.address
+                ? {
+                    house_number: result.address.house_number,
+                    road: result.address.road,
+                    neighbourhood: result.address.neighbourhood,
+                    suburb: result.address.suburb,
+                    city: result.address.city || result.address.town || result.address.village,
+                    county: result.address.county,
+                    state: result.address.state,
+                    postcode: result.address.postcode,
+                    country: result.address.country,
+                  }
+                : undefined,
             };
-
           } catch (error) {
             // Re-throw errors from fetchWithTimeout or validation
             throw error;
@@ -227,21 +236,24 @@ export class GeocodingService {
           factor: 2,
           minTimeout: 1000,
           maxTimeout: 10000,
-          onFailedAttempt: (error) => {
+          onFailedAttempt: error => {
             console.warn(
               `Geocoding attempt ${error.attemptNumber} failed. ${error.retriesLeft} retries left. Error: ${error.message}`
             );
-          }
+          },
         }
       );
-    }) as Promise<GeocodeResult>);
+    }) as Promise<GeocodeResult>;
   }
 
   /**
    * Batch geocode multiple addresses
    */
-  async batchGeocode(addresses: string[], options: Partial<GeocodeOptions> = {}): Promise<GeocodeResult[]> {
-    const promises = addresses.map(address => 
+  async batchGeocode(
+    addresses: string[],
+    options: Partial<GeocodeOptions> = {}
+  ): Promise<GeocodeResult[]> {
+    const promises = addresses.map(address =>
       this.geocode(address, options).catch(error => {
         console.warn(`Failed to geocode address "${address}":`, error.message);
         return null;
@@ -255,10 +267,13 @@ export class GeocodingService {
   /**
    * Reverse geocode coordinates to an address
    */
-  async reverseGeocode(coordinates: Coordinates, options: Partial<GeocodeOptions> = {}): Promise<GeocodeResult> {
+  async reverseGeocode(
+    coordinates: Coordinates,
+    options: Partial<GeocodeOptions> = {}
+  ): Promise<GeocodeResult> {
     const geocodeOptions = { ...this.defaultOptions, ...options };
 
-    return (this.queue.add(async (): Promise<GeocodeResult> => {
+    return this.queue.add(async (): Promise<GeocodeResult> => {
       return pRetry(
         async () => {
           try {
@@ -288,23 +303,24 @@ export class GeocodingService {
             return {
               coordinates: {
                 latitude: parseFloat(result.lat),
-                longitude: parseFloat(result.lon)
+                longitude: parseFloat(result.lon),
               },
               display_name: result.display_name,
               confidence: result.importance,
-              address: result.address ? {
-                house_number: result.address.house_number,
-                road: result.address.road,
-                neighbourhood: result.address.neighbourhood,
-                suburb: result.address.suburb,
-                city: result.address.city || result.address.town || result.address.village,
-                county: result.address.county,
-                state: result.address.state,
-                postcode: result.address.postcode,
-                country: result.address.country
-              } : undefined
+              address: result.address
+                ? {
+                    house_number: result.address.house_number,
+                    road: result.address.road,
+                    neighbourhood: result.address.neighbourhood,
+                    suburb: result.address.suburb,
+                    city: result.address.city || result.address.town || result.address.village,
+                    county: result.address.county,
+                    state: result.address.state,
+                    postcode: result.address.postcode,
+                    country: result.address.country,
+                  }
+                : undefined,
             };
-
           } catch (error) {
             // Re-throw errors from fetchWithTimeout
             throw error;
@@ -314,10 +330,10 @@ export class GeocodingService {
           retries: geocodeOptions.retryCount,
           factor: 2,
           minTimeout: 1000,
-          maxTimeout: 10000
+          maxTimeout: 10000,
         }
       );
-    }) as Promise<GeocodeResult>);
+    }) as Promise<GeocodeResult>;
   }
 
   /**

@@ -10,7 +10,7 @@ import {
   SortKey,
   Language,
   BmltDataFormat,
-  Coordinates
+  Coordinates,
 } from '../types';
 import { BmltClient } from './bmlt-client';
 
@@ -186,13 +186,13 @@ export class MeetingQueryBuilder {
   nearCoordinates(coordinates: Coordinates, radiusMiles?: number, radiusKm?: number): this {
     this.params.lat_val = coordinates.latitude;
     this.params.long_val = coordinates.longitude;
-    
+
     if (radiusMiles !== undefined) {
       this.params.geo_width = radiusMiles;
     } else if (radiusKm !== undefined) {
       this.params.geo_width_km = radiusKm;
     }
-    
+
     return this;
   }
 
@@ -352,7 +352,7 @@ export class MeetingQueryBuilder {
       radiusMiles,
       radiusKm,
       sortByDistance,
-      searchParams: this.params
+      searchParams: this.params,
     });
   }
 }
