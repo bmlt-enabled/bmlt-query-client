@@ -34,7 +34,7 @@ jobs:
       run: npm run lint
       
     - name: Build project
-      run: npm run build:esm
+      run: npm run build:all
       
     - name: Test project (when tests exist)
       run: npm test
@@ -59,7 +59,7 @@ jobs:
       run: npm ci
       
     - name: Build project
-      run: npm run build:esm
+      run: npm run build:all
       
     - name: Update version from tag
       run: |
