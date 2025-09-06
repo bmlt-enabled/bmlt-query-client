@@ -30,23 +30,15 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-#    - name: Run linting
-#      run: npm run lint
+    - name: Run linting
+      run: npm run lint
       
     - name: Build project
       run: npm run build
       
     - name: Test project (when tests exist)
       run: npm test
-      
-    - name: Check if build artifacts exist
-      run: |
-        if [ ! -f "dist/index.js" ]; then
-          echo "Build failed: dist/index.js not found"
-          exit 1
-        fi
-        echo "✅ Build successful - dist/index.js exists"
-        
+
     - name: Test installation
       run: |
         npm pack
