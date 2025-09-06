@@ -8,6 +8,7 @@
 A modern TypeScript/JavaScript client for querying BMLT (Basic Meeting List Tool) servers with built-in geocoding support using the native fetch API.
 
 ## Demo
+
 [https://bmlt-enabled.github.io/bmlt-query-client/](https://bmlt-enabled.github.io/bmlt-query-client/)
 
 ## Features
@@ -238,6 +239,28 @@ npm run type-check    # TypeScript checking
 ```
 
 ## Configuration
+
+### Runtime Configuration
+
+You can update client settings after initialization:
+
+```javascript
+// Update user agent for all requests
+client.setUserAgent('my-updated-app/2.0.0');
+console.log(client.getUserAgent()); // 'my-updated-app/2.0.0'
+
+// Update request timeout
+client.setTimeout(60000); // 60 seconds
+console.log(client.getTimeout()); // 60000
+
+// Update root server URL
+client.setRootServerURL('https://new-server.org/main_server');
+console.log(client.getRootServerURL());
+
+// Update default data format
+client.setDefaultFormat(BmltDataFormat.JSONP);
+console.log(client.getDefaultFormat());
+```
 
 ### Client Options
 

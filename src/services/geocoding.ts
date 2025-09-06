@@ -363,4 +363,21 @@ export class GeocodingService {
   setConcurrency(concurrency: number): void {
     this.queue.concurrency = concurrency;
   }
+
+  /**
+   * Get the current user agent string
+   */
+  getUserAgent(): string {
+    return this.defaultOptions.userAgent;
+  }
+
+  /**
+   * Set the user agent string for geocoding requests
+   */
+  setUserAgent(userAgent: string): void {
+    if (!userAgent || typeof userAgent !== 'string' || userAgent.trim().length === 0) {
+      throw new Error('User agent must be a non-empty string');
+    }
+    this.defaultOptions.userAgent = userAgent.trim();
+  }
 }

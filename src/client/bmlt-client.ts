@@ -369,4 +369,43 @@ export class BmltClient {
       this.geocodingService.clearQueue();
     }
   }
+
+  /**
+   * Get the current user agent string
+   */
+  getUserAgent(): string {
+    return this.userAgent;
+  }
+
+  /**
+   * Set the user agent string for HTTP requests
+   */
+  setUserAgent(userAgent: string): void {
+    if (!userAgent || typeof userAgent !== 'string' || userAgent.trim().length === 0) {
+      throw new Error('User agent must be a non-empty string');
+    }
+    this.userAgent = userAgent.trim();
+
+    // Also update the geocoding service user agent if it exists
+    if (this.geocodingService) {
+      this.geocodingService.setUserAgent(this.userAgent);
+    }
+  }
+
+  /**
+   * Get the current timeout setting
+   */
+  getTimeout(): number {
+    return this.timeout;
+  }
+
+  /**
+   * Set the timeout for HTTP requests
+   */
+  setTimeout(timeout: number): void {
+    if (!Number.isInteger(timeout) || timeout <= 0) {
+      throw new Error('Timeout must be a positive integer');
+    }
+    this.timeout = timeout;
+  }
 }

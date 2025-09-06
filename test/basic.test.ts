@@ -140,4 +140,38 @@ describe('BMLT Query Client - Basic Tests', () => {
       );
     }).toThrow('Latitude must be between -90 and 90 degrees');
   });
+
+  test('should handle user agent configuration', () => {
+    // Test getting default user agent
+    expect(client.getUserAgent()).toBe('bmlt-query-client/1.0.0');
+
+    // Test setting custom user agent
+    const customUserAgent = 'my-custom-app/2.1.0';
+    client.setUserAgent(customUserAgent);
+    expect(client.getUserAgent()).toBe(customUserAgent);
+
+    // Test validation
+    expect(() => client.setUserAgent('')).toThrow('User agent must be a non-empty string');
+    expect(() => client.setUserAgent('   ')).toThrow('User agent must be a non-empty string');
+
+    // Reset user agent for other tests
+    client.setUserAgent('bmlt-query-client/1.0.0');
+  });
+
+  test('should handle timeout configuration', () => {
+    // Test getting current timeout (set to 15000 for this test client)
+    expect(client.getTimeout()).toBe(15000);
+
+    // Test setting custom timeout
+    client.setTimeout(60000);
+    expect(client.getTimeout()).toBe(60000);
+
+    // Test validation
+    expect(() => client.setTimeout(-1)).toThrow('Timeout must be a positive integer');
+    expect(() => client.setTimeout(0)).toThrow('Timeout must be a positive integer');
+    expect(() => client.setTimeout(1.5)).toThrow('Timeout must be a positive integer');
+
+    // Reset timeout for other tests
+    client.setTimeout(15000);
+  });
 });
