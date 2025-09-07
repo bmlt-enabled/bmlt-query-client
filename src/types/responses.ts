@@ -74,6 +74,9 @@ export interface Meeting {
   /** Service body ID */
   service_body_bigint: string;
 
+  /** Service body Name */
+  service_body_name?: string;
+
   /** Meeting formats (comma-separated format IDs) */
   format_shared_id_list?: string;
 

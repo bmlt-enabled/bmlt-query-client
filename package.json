@@ -18,8 +18,7 @@
   "scripts": {
     "build": "vite build",
     "clean": "rimraf dist",
-    "test": "vitest",
-    "test:ci": "vitest run",
+    "test": "vitest run",
     "lint": "eslint src --ext ts",
     "format": "prettier --write \"src/**/*.{ts,js,json}\" \"test/**/*.{ts,js}\" \"*.{ts,js,json,md}\" \"docs/**/*.html\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\" \"test/**/*.{ts,js}\" \"*.{ts,js,json,md}\" \"docs/**/*.html\"",
@@ -55,7 +54,7 @@
     "globals": "^16.3.0",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.0",
-    "typescript": "^5.0.0",
+    "typescript": "5.8.2",
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.0.0"
