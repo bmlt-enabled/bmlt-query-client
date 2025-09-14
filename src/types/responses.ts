@@ -50,6 +50,9 @@ export interface Meeting {
   /** Location province/state */
   location_province?: string;
 
+  /** Location sub province/county */
+  location_sub_province?: string;
+
   /** Location nation */
   location_nation?: string;
 
@@ -67,9 +70,6 @@ export interface Meeting {
 
   /** World Committee Code */
   worldid_mixed?: string;
-
-  /** Shared group ID */
-  shared_group_id_bigint?: string;
 
   /** Service body ID */
   service_body_bigint: string;
