@@ -132,7 +132,9 @@ export function validateRootServerURL(url: string): string {
     // Return the URL without trailing slash for consistency
     return urlObj.href.replace(/\/$/, '');
   } catch (error) {
-    throw new Error(`Invalid root server URL: ${url}`);
+    const validationError = new Error(`Invalid root server URL: ${url}`);
+    validationError.cause = error;
+    throw validationError;
   }
 }
 

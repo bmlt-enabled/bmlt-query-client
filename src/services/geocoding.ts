@@ -238,7 +238,7 @@ export class GeocodingService {
           maxTimeout: 10000,
           onFailedAttempt: error => {
             console.warn(
-              `Geocoding attempt ${error.attemptNumber} failed. ${error.retriesLeft} retries left. Error: ${error.message}`
+              `Geocoding attempt ${error.attemptNumber} failed. ${error.retriesLeft} retries left. Error: ${error.error.message}`
             );
           },
         }
@@ -375,7 +375,7 @@ export class GeocodingService {
    * Set the user agent string for geocoding requests
    */
   setUserAgent(userAgent: string): void {
-    if (!userAgent || typeof userAgent !== 'string' || userAgent.trim().length === 0) {
+    if (!userAgent || userAgent.trim().length === 0) {
       throw new Error('User agent must be a non-empty string');
     }
     this.defaultOptions.userAgent = userAgent.trim();
