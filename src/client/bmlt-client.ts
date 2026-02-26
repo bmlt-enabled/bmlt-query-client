@@ -58,7 +58,7 @@ export interface BmltClientOptions {
 export class BmltClient {
   private timeout: number;
   private userAgent: string;
-  private geocodingService?: GeocodingService;
+  private readonly geocodingService?: GeocodingService;
   private rootServerURL: string;
   private defaultFormat: BmltDataFormat;
 
@@ -381,7 +381,7 @@ export class BmltClient {
    * Set the user agent string for HTTP requests
    */
   setUserAgent(userAgent: string): void {
-    if (!userAgent || typeof userAgent !== 'string' || userAgent.trim().length === 0) {
+    if (!userAgent || userAgent.trim().length === 0) {
       throw new Error('User agent must be a non-empty string');
     }
     this.userAgent = userAgent.trim();
