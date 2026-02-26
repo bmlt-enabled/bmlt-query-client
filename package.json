@@ -37,7 +37,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bmlt-enabled/bmlt-query-client.git"
+    "url": "git+https://github.com/bmlt-enabled/bmlt-query-client.git"
   },
   "dependencies": {
     "p-queue": "^9.1.0",
