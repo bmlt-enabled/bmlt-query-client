@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
@@ -20,7 +22,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     target: 'es2020',
-    rollupOptions: {
+    rolldownOptions: {
       // Don't externalize any dependencies - bundle everything for browser use
       external: [],
     },

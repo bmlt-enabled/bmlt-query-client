@@ -33,7 +33,7 @@
     "geocoding",
     "api-client"
   ],
-  "author": "Patrick Joyce",
+  "author": "BMLT Enabled",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -55,7 +55,7 @@
     "prettier": "^3.6.2",
     "rimraf": "^6.0.0",
     "typescript": "5..2",
-    "vite": "^7.0.0",
+    "vite": "^8.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.0.0"
   },
