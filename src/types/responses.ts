@@ -101,7 +101,7 @@ export interface Meeting {
 
 export interface Format {
   /** Format ID */
-  shared_id_bigint: string;
+  id: string;
 
   /** Format key string */
   key_string: string;
@@ -114,6 +114,12 @@ export interface Format {
 
   /** Language */
   lang: string;
+
+  /** World format ID */
+  world_id?: string;
+
+  /** Format type enum */
+  format_type_enum?: string;
 
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
