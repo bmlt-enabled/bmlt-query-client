@@ -9,6 +9,7 @@ import {
   BmltError,
   Meeting,
   Format,
+  MeetingsWithFormats,
   ServiceBody,
   Change,
   ServerInfo,
@@ -170,6 +171,26 @@ export class BmltClient {
   async searchMeetings(params: SearchResultsParams = {}): Promise<Meeting[]> {
     const { format = this.defaultFormat, ...searchParams } = params;
     return this.makeRequest<Meeting[]>(BmltEndpoint.GET_SEARCH_RESULTS, searchParams, format);
+  }
+
+  /**
+   * Search for meetings and return both meetings and the formats they reference in a
+   * single request. Uses get_used_formats=true so the server wraps the response as
+   * { meetings: Meeting[], formats: Format[] } instead of a bare Meeting[].
+   *
+   * This replaces the common pattern of Promise.all([getFormats(), searchMeetings()])
+   * with a single round-trip, which matters for large servers where getFormats() can
+   * return hundreds of unused format records.
+   */
+  async searchMeetingsWithFormats(
+    params: Omit<SearchResultsParams, 'get_used_formats' | 'get_formats_only'> = {}
+  ): Promise<MeetingsWithFormats> {
+    const { format = this.defaultFormat, ...searchParams } = params;
+    return this.makeRequest<MeetingsWithFormats>(
+      BmltEndpoint.GET_SEARCH_RESULTS,
+      { ...searchParams, get_used_formats: true },
+      format
+    );
   }
 
   /**

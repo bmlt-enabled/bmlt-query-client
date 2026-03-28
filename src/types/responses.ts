@@ -254,6 +254,18 @@ export interface FieldValue {
   meeting_id: string;
 }
 
+/**
+ * Combined response when get_used_formats=true is passed to GetSearchResults.
+ * The BMLT API wraps the response in an object with separate meetings and formats arrays
+ * instead of returning a bare meetings array.
+ */
+export interface MeetingsWithFormats {
+  /** Meetings matching the search criteria */
+  meetings: Meeting[];
+  /** Only the formats actually referenced by the returned meetings */
+  formats: Format[];
+}
+
 export interface GeocodeResult {
   /** Geocoded coordinates */
   coordinates: Coordinates;

@@ -126,6 +126,30 @@ describe('BMLT Query Client - Basic Tests', () => {
     });
   });
 
+  test('should fetch meetings and formats in a single request', async () => {
+    const result = await client.searchMeetingsWithFormats({ page_size: 10 });
+
+    expect(result).toHaveProperty('meetings');
+    expect(result).toHaveProperty('formats');
+    expect(Array.isArray(result.meetings)).toBe(true);
+    expect(Array.isArray(result.formats)).toBe(true);
+    expect(result.meetings.length).toBeGreaterThan(0);
+    expect(result.formats.length).toBeGreaterThan(0);
+
+    // Every format returned should be referenced by at least one meeting
+    const usedFormatIds = new Set(
+      result.meetings.flatMap(m =>
+        (m.format_shared_id_list ?? '')
+          .split(',')
+          .map(id => id.trim())
+          .filter(Boolean)
+      )
+    );
+    result.formats.forEach(fmt => {
+      expect(usedFormatIds.has(fmt.id)).toBe(true);
+    });
+  });
+
   test.skip('should handle geocoding errors gracefully', async () => {
     await expect(
       client.geocodeAddress('This Is Not A Real Address That Exists Anywhere')

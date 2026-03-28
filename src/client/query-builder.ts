@@ -5,6 +5,7 @@
 import {
   SearchResultsParams,
   Meeting,
+  MeetingsWithFormats,
   Weekday,
   VenueType,
   SortKey,
@@ -336,6 +337,15 @@ export class MeetingQueryBuilder {
    */
   async execute(): Promise<Meeting[]> {
     return this.client.searchMeetings(this.params);
+  }
+
+  /**
+   * Execute the search and return both meetings and the formats they reference
+   * in a single request. Equivalent to execute() but avoids a separate getFormats() call.
+   */
+  async executeWithFormats(): Promise<MeetingsWithFormats> {
+    const { get_used_formats, get_formats_only, ...params } = this.params;
+    return this.client.searchMeetingsWithFormats(params);
   }
 
   /**
