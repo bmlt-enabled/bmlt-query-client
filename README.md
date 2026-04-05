@@ -38,7 +38,7 @@ The easiest way to use the BMLT Query Client in the browser is via ES modules:
 
   // Initialize the client
   const client = new BmltClient({
-    rootServerURL: 'https://latest.aws.bmlt.app/main_server', // NYC demo server
+    serverURL: 'https://latest.aws.bmlt.app/main_server', // NYC demo server
   });
 
   // Search for virtual meetings
@@ -72,7 +72,7 @@ npm install bmlt-query-client
 import { BmltClient, VenueType, MeetingQueryBuilder } from 'bmlt-query-client';
 
 const client = new BmltClient({
-  rootServerURL: 'https://your-bmlt-server.org/main_server',
+  serverURL: 'https://your-bmlt-server.org/main_server',
 });
 
 // Search for meetings
@@ -253,9 +253,9 @@ console.log(client.getUserAgent()); // 'my-updated-app/2.0.0'
 client.setTimeout(60000); // 60 seconds
 console.log(client.getTimeout()); // 60000
 
-// Update root server URL
-client.setRootServerURL('https://new-server.org/main_server');
-console.log(client.getRootServerURL());
+// Update server URL
+client.setServerURL('https://new-server.org/main_server');
+console.log(client.getServerURL());
 
 // Update default data format
 client.setDefaultFormat(BmltDataFormat.JSONP);
@@ -266,7 +266,7 @@ console.log(client.getDefaultFormat());
 
 ```javascript
 const client = new BmltClient({
-  rootServerURL: 'https://your-server.org/main_server', // Required
+  serverURL: 'https://your-server.org/main_server', // Required
   defaultFormat: BmltDataFormat.JSON, // Optional
   timeout: 30000, // 30 seconds
   userAgent: 'my-app/1.0.0', // Custom user agent
@@ -283,7 +283,7 @@ const client = new BmltClient({
 
 ```javascript
 const client = new BmltClient({
-  rootServerURL: 'https://your-server.org/main_server',
+  serverURL: 'https://your-server.org/main_server',
   geocodingOptions: {
     countryCode: 'us', // ISO country code bias
     viewbox: [-74.2, 40.4, -73.7, 40.9], // Geographic bounding box [w,s,e,n]

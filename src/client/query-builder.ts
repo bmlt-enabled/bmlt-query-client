@@ -297,13 +297,13 @@ export class MeetingQueryBuilder {
   }
 
   /**
-   * Filter by root server IDs (aggregator mode)
+   * Filter by server IDs (aggregator mode)
    */
-  rootServerIds(serverIds: number | number[], exclude = false): this {
+  serverIds(serverIds: number | number[], exclude = false): this {
     if (Array.isArray(serverIds)) {
-      this.params.root_server_ids = exclude ? serverIds.map(id => -id) : serverIds;
+      this.params.server_ids = exclude ? serverIds.map(id => -id) : serverIds;
     } else {
-      this.params.root_server_ids = exclude ? -serverIds : serverIds;
+      this.params.server_ids = exclude ? -serverIds : serverIds;
     }
     return this;
   }

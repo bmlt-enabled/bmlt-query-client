@@ -7,7 +7,7 @@ import { BmltClient, Weekday, VenueType, BmltQueryError } from '../src/index';
 
 describe('BMLT Query Client - Basic Tests', () => {
   const client = new BmltClient({
-    rootServerURL: 'https://latest.aws.bmlt.app/main_server',
+    serverURL: 'https://latest.aws.bmlt.app/main_server',
     timeout: 15000, // 15 second timeout for tests
   });
 

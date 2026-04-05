@@ -116,8 +116,8 @@ export interface SearchResultsParams extends BaseSearchParams {
   /** Published status: undefined=published only, 0=all, -1=unpublished only */
   advanced_published?: 0 | -1;
 
-  /** Include specific root server IDs (for aggregator mode) */
-  root_server_ids?: number | number[];
+  /** Include specific server IDs (for aggregator mode) */
+  server_ids?: number | number[];
 }
 
 export interface GeographicSearchParams {

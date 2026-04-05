@@ -189,7 +189,7 @@
 
       // Initialize the client with NYC demo server
       const client = new BmltClient({
-        rootServerURL: 'https://latest.aws.bmlt.app/main_server',
+        serverURL: 'https://latest.aws.bmlt.app/main_server',
       });
 
       // Make utilities available globally for the demo functions
@@ -367,7 +367,7 @@
             const info = serverInfo[0];
             html += `
                         <p><strong>Version:</strong> ${info.version}</p>
-                        <p><strong>Server:</strong> ${client.getRootServerURL()}</p>
+                        <p><strong>Server:</strong> ${client.getServerURL()}</p>
                         <div class="stats">Raw response: ${JSON.stringify(info, null, 2)}</div>
                     `;
           } else {

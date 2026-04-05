@@ -5,7 +5,7 @@
 import { BmltDataFormat, BmltEndpoint } from '../types';
 
 export interface URLBuilderOptions {
-  rootServerURL: string;
+  serverURL: string;
   format: BmltDataFormat;
   endpoint: BmltEndpoint;
   parameters?: Record<string, unknown>;
@@ -15,10 +15,10 @@ export interface URLBuilderOptions {
  * Build a BMLT API URL with parameters
  */
 export function buildBmltURL(options: URLBuilderOptions): string {
-  const { rootServerURL, format, endpoint, parameters = {} } = options;
+  const { serverURL, format, endpoint, parameters = {} } = options;
 
-  // Ensure root server URL ends with slash
-  const baseURL = rootServerURL.endsWith('/') ? rootServerURL : `${rootServerURL}/`;
+  // Ensure server URL ends with slash
+  const baseURL = serverURL.endsWith('/') ? serverURL : `${serverURL}/`;
 
   // Build the base endpoint URL
   const endpointURL = `${baseURL}client_interface/${format}/`;
@@ -120,19 +120,19 @@ export function validateEndpointFormat(endpoint: BmltEndpoint, format: BmltDataF
 }
 
 /**
- * Clean and validate a root server URL
+ * Clean and validate a server URL
  */
-export function validateRootServerURL(url: string): string {
+export function validateServerURL(url: string): string {
   try {
     const urlObj = new URL(url);
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
-      throw new Error('Root server URL must use http or https protocol');
+      throw new Error('Server URL must use http or https protocol');
     }
 
     // Return the URL without trailing slash for consistency
     return urlObj.href.replace(/\/$/, '');
   } catch (error) {
-    const validationError = new Error(`Invalid root server URL: ${url}`);
+    const validationError = new Error(`Invalid server URL: ${url}`);
     validationError.cause = error;
     throw validationError;
   }

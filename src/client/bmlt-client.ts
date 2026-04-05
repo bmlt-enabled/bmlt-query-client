@@ -30,15 +30,15 @@ import {
 import {
   buildBmltURL,
   validateEndpointFormat,
-  validateRootServerURL,
+  validateServerURL,
   validateCoordinates,
   validateRadius,
 } from '../utils/url-builder';
 import { ErrorHandler } from '../utils/errors';
 
 export interface BmltClientOptions {
-  /** Root server URL */
-  rootServerURL: string;
+  /** Server URL */
+  serverURL: string;
 
   /** Default data format */
   defaultFormat?: BmltDataFormat;
@@ -60,12 +60,12 @@ export class BmltClient {
   private timeout: number;
   private userAgent: string;
   private readonly geocodingService?: GeocodingService;
-  private rootServerURL: string;
+  private serverURL: string;
   private defaultFormat: BmltDataFormat;
 
   constructor(options: BmltClientOptions) {
     const {
-      rootServerURL,
+      serverURL,
       defaultFormat = BmltDataFormat.JSON,
       timeout = 30000,
       userAgent = 'bmlt-query-client/1.0.0',
@@ -73,8 +73,8 @@ export class BmltClient {
       enableGeocoding = true,
     } = options;
 
-    // Validate and normalize root server URL
-    this.rootServerURL = validateRootServerURL(rootServerURL);
+    // Validate and normalize server URL
+    this.serverURL = validateServerURL(serverURL);
     this.defaultFormat = defaultFormat;
     this.timeout = timeout;
     this.userAgent = userAgent;
@@ -101,7 +101,7 @@ export class BmltClient {
 
       // Build the request URL
       const url = buildBmltURL({
-        rootServerURL: this.rootServerURL,
+        serverURL: this.serverURL,
         format,
         endpoint,
         parameters,
@@ -341,17 +341,17 @@ export class BmltClient {
   }
 
   /**
-   * Get the root server URL
+   * Get the server URL
    */
-  getRootServerURL(): string {
-    return this.rootServerURL;
+  getServerURL(): string {
+    return this.serverURL;
   }
 
   /**
-   * Update the root server URL
+   * Update the server URL
    */
-  setRootServerURL(url: string): void {
-    this.rootServerURL = validateRootServerURL(url);
+  setServerURL(url: string): void {
+    this.serverURL = validateServerURL(url);
   }
 
   /**

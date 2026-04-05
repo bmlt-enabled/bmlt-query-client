@@ -87,7 +87,7 @@ import { BmltClient, Weekday, VenueType } from 'bmlt-query-client';
 
 // Initialize client with NYC demo server
 const client = new BmltClient({
-  rootServerURL: 'https://latest.aws.bmlt.app/main_server',
+  serverURL: 'https://latest.aws.bmlt.app/main_server',
 });
 
 // Search by address with automatic geocoding

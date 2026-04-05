@@ -6,7 +6,7 @@ import { BmltClient, Weekday, VenueType, Language, MeetingQueryBuilder, QuickSea
 
 // Initialize client with NYC demo server
 const client = new BmltClient({
-  rootServerURL: 'https://latest.aws.bmlt.app/main_server'
+  serverURL: 'https://latest.aws.bmlt.app/main_server'
 });
 
 async function basicExamples() {
@@ -221,7 +221,7 @@ async function errorHandlingExample() {
   try {
     // Try to connect to an invalid server
     const badClient = new BmltClient({
-      rootServerURL: 'https://invalid-server-that-does-not-exist.com',
+      serverURL: 'https://invalid-server-that-does-not-exist.com',
       timeout: 5000
     });
     await badClient.searchMeetings();
