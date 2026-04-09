@@ -47,6 +47,9 @@ export interface SearchResultsParams extends BaseSearchParams {
   /** Search radius for geographic searches */
   SearchStringRadius?: number;
 
+  /** Treat SearchString as an address and have the server geocode it. Note: typically broken on most servers because the Google API key uses HTTP referer restrictions rather than server IP allowlisting. Prefer searchMeetingsByAddress() which uses Nominatim client-side. */
+  StringSearchIsAnAddress?: boolean;
+
   /** Meetings starting after hour (0-23) */
   StartsAfterH?: number;
 
@@ -116,8 +119,8 @@ export interface SearchResultsParams extends BaseSearchParams {
   /** Published status: undefined=published only, 0=all, -1=unpublished only */
   advanced_published?: 0 | -1;
 
-  /** Include specific server IDs (for aggregator mode) */
-  server_ids?: number | number[];
+  /** Include specific root server IDs (for aggregator mode) */
+  root_server_ids?: number | number[];
 }
 
 export interface GeographicSearchParams {

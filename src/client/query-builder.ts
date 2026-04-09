@@ -137,6 +137,19 @@ export class MeetingQueryBuilder {
   }
 
   /**
+   * Search by address using server-side geocoding (StringSearchIsAnAddress=1).
+   * Note: typically broken on most BMLT servers because their Google API key uses
+   * HTTP referer restrictions rather than server IP allowlisting. Prefer
+   * BmltClient.searchMeetingsByAddress() which uses Nominatim client-side.
+   */
+  searchAddress(address: string, radius?: number): this {
+    this.params.SearchString = address;
+    this.params.StringSearchIsAnAddress = true;
+    if (radius !== undefined) this.params.SearchStringRadius = radius;
+    return this;
+  }
+
+  /**
    * Meetings starting after specific time
    */
   startingAfter(hours: number, minutes = 0): this {
@@ -297,13 +310,13 @@ export class MeetingQueryBuilder {
   }
 
   /**
-   * Filter by server IDs (aggregator mode)
+   * Filter by root server IDs (aggregator mode)
    */
-  serverIds(serverIds: number | number[], exclude = false): this {
+  rootServerIds(serverIds: number | number[], exclude = false): this {
     if (Array.isArray(serverIds)) {
-      this.params.server_ids = exclude ? serverIds.map(id => -id) : serverIds;
+      this.params.root_server_ids = exclude ? serverIds.map(id => -id) : serverIds;
     } else {
-      this.params.server_ids = exclude ? -serverIds : serverIds;
+      this.params.root_server_ids = exclude ? -serverIds : serverIds;
     }
     return this;
   }

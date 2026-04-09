@@ -150,6 +150,103 @@ describe('BMLT Query Client - Basic Tests', () => {
     });
   });
 
+  test('should filter formats with OR (formats_comparison_operator)', async () => {
+    const formats = await client.getFormats();
+    // Pick two real format ids from the live server
+    const ids = formats.slice(0, 2).map(f => parseInt(f.id));
+    expect(ids.length).toBe(2);
+
+    const andResults = await client.searchMeetings({ formats: ids, page_size: 50 });
+    const orResults = await client.searchMeetings({
+      formats: ids,
+      formats_comparison_operator: 'OR',
+      page_size: 50,
+    });
+
+    // OR should be a superset of AND
+    expect(orResults.length).toBeGreaterThanOrEqual(andResults.length);
+
+    // Every OR result must reference at least one of the requested formats
+    orResults.forEach(meeting => {
+      const meetingFormatIds = (meeting.format_shared_id_list ?? '')
+        .split(',')
+        .map(id => parseInt(id.trim()))
+        .filter(n => !isNaN(n));
+      expect(ids.some(id => meetingFormatIds.includes(id))).toBe(true);
+    });
+  });
+
+  test('should get service bodies with recursive children', async () => {
+    const all = await client.getServiceBodies();
+    // Find a service body that has at least one child
+    const parent = all.find(sb => all.some(c => parseInt(c.parent_id) === parseInt(sb.id)));
+    if (!parent) return; // server has no hierarchy; skip assertions
+
+    const flat = await client.getServiceBodies({ services: [parseInt(parent.id)] });
+    const recursive = await client.getServiceBodies({
+      services: [parseInt(parent.id)],
+      recursive: true,
+    });
+
+    expect(flat.length).toBe(1);
+    expect(recursive.length).toBeGreaterThan(1);
+    expect(recursive.some(sb => sb.id === parent.id)).toBe(true);
+  });
+
+  test('should get service bodies with parents hierarchy', async () => {
+    const all = await client.getServiceBodies();
+    // Find a child whose parent_id resolves to a real service body
+    const child = all.find(
+      sb => parseInt(sb.parent_id) > 0 && all.some(p => p.id === sb.parent_id)
+    );
+    if (!child) return;
+
+    const withParents = await client.getServiceBodies({
+      services: [parseInt(child.id)],
+      parents: true,
+    });
+
+    expect(withParents.length).toBeGreaterThan(1);
+    expect(withParents.some(sb => sb.id === child.id)).toBe(true);
+    expect(withParents.some(sb => sb.id === child.parent_id)).toBe(true);
+  });
+
+  test('should get field keys', async () => {
+    const keys = await client.getFieldKeys();
+    expect(Array.isArray(keys)).toBe(true);
+    expect(keys.length).toBeGreaterThan(0);
+    expect(keys[0]).toHaveProperty('key');
+  });
+
+  test('should get field values for meeting_name', async () => {
+    const values = await client.getFieldValues({ meeting_key: 'meeting_name' });
+    expect(Array.isArray(values)).toBe(true);
+    expect(values.length).toBeGreaterThan(0);
+  });
+
+  test('should get meeting changes within a date range', async () => {
+    const end = new Date();
+    const start = new Date();
+    start.setFullYear(end.getFullYear() - 1);
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+    const changes = await client.getChanges({
+      start_date: fmt(start),
+      end_date: fmt(end),
+    });
+
+    expect(Array.isArray(changes)).toBe(true);
+    if (changes.length > 0) {
+      expect(changes[0]).toHaveProperty('date_string');
+      expect(changes[0]).toHaveProperty('change_type');
+    }
+  });
+
+  test('should get coverage area', async () => {
+    const coverage = await client.getCoverageArea();
+    expect(coverage).toBeDefined();
+  });
+
   test.skip('should handle geocoding errors gracefully', async () => {
     await expect(
       client.geocodeAddress('This Is Not A Real Address That Exists Anywhere')
