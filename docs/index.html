@@ -522,10 +522,15 @@
       padding: 12px;
       overflow-x: auto;
       line-height: 1.7;
-      white-space: pre-wrap;
-      word-break: break-all;
+      white-space: pre;
+      word-break: normal;
       margin-top: 10px;
     }
+    pre.data-pre .json-key    { color: #7dd3fc; }
+    pre.data-pre .json-str    { color: #86efac; }
+    pre.data-pre .json-num    { color: #fda4af; }
+    pre.data-pre .json-bool   { color: #c4b5fd; }
+    pre.data-pre .json-null   { color: #94a3b8; }
 
     /* ── Load more ──────────────────────────────────── */
     .load-more-wrap { padding: 14px 0 2px; text-align: center; }
@@ -718,6 +723,22 @@
       2: { label:'Virtual',   cls:'vrt' },
       3: { label:'Hybrid',    cls:'hyb' },
     };
+
+    // ── JSON syntax highlighter ────────────────────────
+    function jsonHL(obj) {
+      const raw = JSON.stringify(obj, null, 2);
+      return esc(raw).replace(
+        /(&quot;)(.*?)(&quot;)(\s*:)|(&quot;)(.*?)(&quot;)|(-?\d+\.?\d*(?:[eE][+-]?\d+)?)|(\btrue\b|\bfalse\b)|(\bnull\b)/g,
+        (m, q1, k, q3, colon, q5, v, q7, num, bool, nil) => {
+          if (colon)   return `<span class="json-key">${q1}${k}${q3}</span>${colon}`;
+          if (q5)      return `<span class="json-str">${q5}${v}${q7}</span>`;
+          if (num)     return `<span class="json-num">${num}</span>`;
+          if (bool)    return `<span class="json-bool">${bool}</span>`;
+          if (nil)     return `<span class="json-null">${nil}</span>`;
+          return m;
+        }
+      );
+    }
 
     // ── Helpers ────────────────────────────────────────
     function esc(s) {
@@ -1005,7 +1026,7 @@
               <div><span style="color:var(--text-d)">URL</span> &nbsp; ${esc(client.getServerURL())}</div>
               <div><span style="color:var(--text-d)">Version</span> &nbsp; ${esc(d?.version ?? '—')}</div>
             </div>
-            <pre class="data-pre">${esc(JSON.stringify(d, null, 2))}</pre>
+            <pre class="data-pre">${jsonHL(d)}</pre>
           </div>`;
         setStatus('Server info loaded', 'success');
         setCount(null, null);
