@@ -1,495 +1,1095 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BMLT Query Client - ES Module Demo</title>
-    <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        line-height: 1.6;
-      }
-      .container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-      .panel {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-      }
-      .controls {
-        margin-bottom: 20px;
-      }
-      .btn {
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin: 5px;
-      }
-      .btn:hover {
-        background: #0056b3;
-      }
-      .btn:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-      }
-      input[type='text'],
-      input[type='number'] {
-        width: 100%;
-        padding: 8px;
-        margin: 5px 0;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-      }
-      .results {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 15px;
-        max-height: 400px;
-        overflow-y: auto;
-      }
-      .meeting {
-        background: #fff;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        padding: 10px;
-        margin: 10px 0;
-      }
-      .meeting h4 {
-        margin: 0 0 5px 0;
-        color: #333;
-      }
-      .meeting-info {
-        font-size: 14px;
-        color: #666;
-      }
-      .loading {
-        color: #007bff;
-        font-style: italic;
-      }
-      .error {
-        color: #dc3545;
-        background: #f8d7da;
-        padding: 10px;
-        border-radius: 4px;
-        margin: 10px 0;
-      }
-      .success {
-        color: #155724;
-        background: #d4edda;
-        padding: 10px;
-        border-radius: 4px;
-        margin: 10px 0;
-      }
-      h1 {
-        text-align: center;
-        color: #333;
-      }
-      h2 {
-        color: #333;
-        margin-top: 0;
-      }
-      .stats {
-        font-size: 12px;
-        color: #666;
-        margin-top: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>🏛️ BMLT Query Client - ES Module Demo</h1>
-    <p style="text-align: center">
-      <strong>Using ES Modules directly in the browser!</strong><br />
-      <code>&lt;script type="module" src="https://cdn.aws.bmlt.app/app.js"&gt;&lt;/script&gt;</code
-      ><br />
-      Live demo using the NYC BMLT server: <code>https://latest.aws.bmlt.app/main_server</code>
-    </p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMLT Query Client — Developer Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <div class="container">
-      <!-- Search Panel -->
-      <div class="panel">
-        <h2>🔍 Search Meetings</h2>
+    :root {
+      --bg:            #07090d;
+      --surface:       #0b0f16;
+      --surface-r:     #10161f;
+      --surface-h:     #141c27;
+      --border:        #182030;
+      --border-s:      #0f1620;
+      --border-a:      #253348;
+      --text:          #dbd3c0;
+      --text-m:        #677385;
+      --text-d:        #344152;
+      --accent:        #c07840;
+      --accent-b:      #d4894d;
+      --accent-dim:    rgba(192,120,64,.12);
+      --success:       #4e9e72;
+      --success-bg:    rgba(78,158,114,.08);
+      --error:         #c05858;
+      --error-bg:      rgba(192,88,88,.08);
+      --info:          #5a8ec0;
+      --r:             6px;
+      --rs:            4px;
+      --t:             150ms ease;
+      --ff-d:          'Fraunces', Georgia, serif;
+      --ff-m:          'JetBrains Mono', 'Fira Code', monospace;
+    }
 
-        <div class="controls">
-          <h3>Search by Address</h3>
-          <input
-            type="text"
-            id="addressInput"
-            placeholder="e.g., Times Square, New York, NY"
-            value="Times Square, New York, NY"
-          />
-          <input
-            type="number"
-            id="radiusInput"
-            placeholder="Radius in miles"
-            value="2"
-            min="0.5"
-            max="50"
-            step="0.5"
-          />
-          <button class="btn" onclick="searchByAddress()">Search Nearby Meetings</button>
-        </div>
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff-m);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow: hidden;
+    }
 
-        <div class="controls">
-          <h3>Quick Searches</h3>
-          <button class="btn" onclick="searchVirtualMeetings()">Virtual Meetings</button>
-          <button class="btn" onclick="searchTodaysMeetings()">Today's Meetings</button>
-          <button class="btn" onclick="searchWeekendMeetings()">Weekend Meetings</button>
-          <button class="btn" onclick="searchEveningMeetings()">Evening Meetings</button>
-        </div>
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 10%, rgba(192,120,64,.04) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 15% 85%, rgba(90,142,192,.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        <div class="controls">
-          <h3>Server Info</h3>
-          <button class="btn" onclick="getServerInfo()">Get Server Info</button>
-          <button class="btn" onclick="getFormats()">Get Meeting Formats</button>
-          <button class="btn" onclick="getServiceBodies()">Get Service Bodies</button>
-        </div>
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 54px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,9,13,.96);
+      backdrop-filter: blur(8px);
+      flex-shrink: 0;
+    }
 
-        <div class="controls">
-          <h3>Geocoding Test</h3>
-          <input
-            type="text"
-            id="geocodeInput"
-            placeholder="Address to geocode"
-            value="Central Park, New York, NY"
-          />
-          <button class="btn" onclick="testGeocode()">Geocode Address</button>
-        </div>
-      </div>
+    .h-brand { display: flex; align-items: baseline; gap: 12px; }
 
-      <!-- Results Panel -->
-      <div class="panel">
-        <h2>📋 Results</h2>
-        <div id="status"></div>
-        <div id="results" class="results">
-          <p style="text-align: center; color: #666">Click a search button to see results...</p>
-        </div>
+    .h-title {
+      font-family: var(--ff-d);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -.02em;
+    }
+
+    .h-title em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--accent);
+    }
+
+    .h-sub {
+      font-size: 9px;
+      color: var(--text-d);
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+
+    .h-right { display: flex; align-items: center; gap: 14px; }
+
+    .code-pill {
+      font-size: 10px;
+      color: var(--text-m);
+      background: var(--surface-r);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-family: var(--ff-m);
+    }
+
+    .server-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: var(--text-m);
+    }
+
+    .server-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+      animation: pulse-dot 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; box-shadow: 0 0 6px var(--success); }
+      50%      { opacity:.5; box-shadow: 0 0 2px var(--success); }
+    }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 272px 1fr;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ────────────────────────────────────── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      overflow-y: auto;
+      padding: 16px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .s-section {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-s);
+    }
+    .s-section:last-child { border-bottom: none; }
+
+    .s-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--text-d);
+      font-weight: 500;
+      margin-bottom: 9px;
+    }
+
+    /* ── Inputs ─────────────────────────────────────── */
+    .igroup { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
+
+    input[type='text'], input[type='number'] {
+      width: 100%;
+      padding: 7px 10px;
+      background: var(--surface-r);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      color: var(--text);
+      font-family: var(--ff-m);
+      font-size: 12px;
+      outline: none;
+      transition: border-color var(--t);
+    }
+    input::placeholder { color: var(--text-d); }
+    input:focus { border-color: var(--accent); }
+
+    .radius-row { display: flex; align-items: center; gap: 8px; }
+    .radius-row input { flex: 1; }
+    .iunit { font-size: 10px; color: var(--text-d); white-space: nowrap; }
+
+    /* ── Buttons ────────────────────────────────────── */
+    .btn-primary {
+      width: 100%;
+      padding: 8px 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--rs);
+      font-family: var(--ff-m);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--t), transform var(--t);
+      letter-spacing: .02em;
+    }
+    .btn-primary:hover { background: var(--accent-b); }
+    .btn-primary:active { transform: scale(.98); }
+
+    .btn-ghost {
+      width: 100%;
+      padding: 6px 10px;
+      background: transparent;
+      color: var(--text-m);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      font-family: var(--ff-m);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all var(--t);
+      text-align: left;
+      letter-spacing: .02em;
+    }
+    .btn-ghost:hover { background: var(--surface-h); color: var(--text); border-color: var(--border-a); }
+    .btn-ghost:active { transform: scale(.98); }
+
+    .btn-stack { display: flex; flex-direction: column; gap: 4px; }
+
+    /* ── Chips ──────────────────────────────────────── */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+
+    .chip {
+      padding: 3px 7px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--text-m);
+      font-family: var(--ff-m);
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--t);
+      letter-spacing: .04em;
+    }
+    .chip:hover { border-color: var(--border-a); color: var(--text); }
+    .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-b); }
+
+    /* ── Results pane ───────────────────────────────── */
+    .results-pane { display: flex; flex-direction: column; overflow: hidden; }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 22px;
+      border-bottom: 1px solid var(--border-s);
+      background: var(--surface);
+      min-height: 40px;
+      flex-shrink: 0;
+    }
+
+    .status-msg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-m);
+    }
+
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--text-d);
+      flex-shrink: 0;
+      transition: background var(--t);
+    }
+    .status-dot.loading { background: var(--info); animation: pulse-dot .8s ease-in-out infinite; }
+    .status-dot.success { background: var(--success); }
+    .status-dot.error   { background: var(--error); }
+
+    .result-count { font-size: 10px; color: var(--text-d); }
+
+    .results-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 22px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .results-scroll::-webkit-scrollbar { width: 3px; }
+    .results-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Empty state ────────────────────────────────── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      gap: 10px;
+    }
+    .empty-icon { font-size: 28px; opacity: .12; }
+    .empty-text { font-size: 12px; color: var(--text-d); }
+
+    /* ── Skeleton ───────────────────────────────────── */
+    .skel-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      margin-bottom: 7px;
+    }
+    .skel-line {
+      height: 10px;
+      background: var(--surface-r);
+      border-radius: 3px;
+      animation: skel 1.4s ease-in-out infinite;
+    }
+    .skel-line + .skel-line { margin-top: 7px; }
+    @keyframes skel {
+      0%,100% { opacity:.2; }
+      50%      { opacity:.4; }
+    }
+
+    /* ── Meeting cards ──────────────────────────────── */
+    .meeting-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 13px 15px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      transition: border-color var(--t), background var(--t);
+      animation: card-in .25s ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .meeting-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--day-color, var(--border-a));
+      transition: width var(--t);
+    }
+    .meeting-card:hover { border-color: var(--border-a); background: var(--surface-r); }
+    .meeting-card:hover::before { width: 4px; }
+
+    @keyframes card-in {
+      from { opacity:0; transform: translateY(6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .card-badges { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+
+    .day-badge {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      padding: 2px 6px;
+      border-radius: 100px;
+      font-family: var(--ff-m);
+      border: 1px solid var(--day-color, var(--border));
+      color: var(--day-color, var(--text-m));
+      background: var(--day-bg, rgba(255,255,255,.04));
+    }
+
+    .venue-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 100px;
+      font-family: var(--ff-m);
+    }
+    .venue-badge.ip  { background:rgba(78,158,114,.1);  color:var(--success); border:1px solid rgba(78,158,114,.25); }
+    .venue-badge.vrt { background:rgba(90,142,192,.1);  color:var(--info);    border:1px solid rgba(90,142,192,.25); }
+    .venue-badge.hyb { background:rgba(192,120,64,.1);  color:var(--accent);  border:1px solid rgba(192,120,64,.25); }
+
+    .dist-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 100px;
+      background: var(--accent-dim);
+      color: var(--accent-b);
+      border: 1px solid rgba(192,120,64,.25);
+    }
+
+    .copy-btn {
+      opacity: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-d);
+      cursor: pointer;
+      padding: 2px 5px;
+      font-size: 12px;
+      border-radius: 3px;
+      transition: all var(--t);
+      flex-shrink: 0;
+    }
+    .meeting-card:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--text-m); background: var(--surface-h); }
+
+    .meeting-name {
+      font-family: var(--ff-d);
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.3;
+      letter-spacing: -.01em;
+    }
+
+    .card-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px 12px;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-m);
+    }
+
+    .meta-i {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow: hidden;
+    }
+    .meta-icon { color: var(--text-d); font-size: 10px; flex-shrink: 0; }
+    .meta-t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .card-foot {
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px solid var(--border-s);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .fmt-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+
+    .fmt-tag {
+      font-size: 9px;
+      padding: 1px 5px;
+      background: var(--surface-h);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-d);
+    }
+
+    .join-link {
+      font-size: 10px;
+      color: var(--info);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border: 1px solid rgba(90,142,192,.25);
+      border-radius: var(--rs);
+      background: rgba(90,142,192,.06);
+      transition: all var(--t);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .join-link:hover { background: rgba(90,142,192,.12); border-color: var(--info); }
+
+    /* ── Expanded details ───────────────────────────── */
+    .card-exp { display: none; margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--border-s); }
+    .meeting-card.expanded .card-exp { display: block; }
+
+    .exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .exp-item {}
+    .exp-lbl { font-size: 9px; color: var(--text-d); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1px; }
+    .exp-val { font-size: 11px; color: var(--text-m); }
+
+    /* ── Data cards (server info, formats, etc.) ────── */
+    .data-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      margin-bottom: 7px;
+      animation: card-in .25s ease forwards;
+    }
+
+    .data-title {
+      font-family: var(--ff-d);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 7px;
+      letter-spacing: -.01em;
+    }
+
+    .data-meta { font-size: 11px; color: var(--text-m); line-height: 1.9; }
+
+    .data-tag {
+      display: inline-block;
+      font-size: 10px;
+      background: var(--surface-h);
+      border: 1px solid var(--border);
+      color: var(--text-m);
+      padding: 2px 7px;
+      border-radius: 100px;
+      margin: 2px 3px 2px 0;
+    }
+
+    pre.data-pre {
+      font-family: var(--ff-m);
+      font-size: 10px;
+      color: var(--text-m);
+      background: var(--surface-r);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      padding: 12px;
+      overflow-x: auto;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-top: 10px;
+    }
+
+    /* ── Load more ──────────────────────────────────── */
+    .load-more-wrap { padding: 14px 0 2px; text-align: center; }
+
+    .btn-load-more {
+      padding: 7px 22px;
+      background: transparent;
+      color: var(--text-m);
+      border: 1px solid var(--border-a);
+      border-radius: var(--rs);
+      font-family: var(--ff-m);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all var(--t);
+    }
+    .btn-load-more:hover { background: var(--surface-r); color: var(--text); }
+
+    .lm-label { font-size: 10px; color: var(--text-d); margin-top: 5px; }
+
+    /* ── Toast ──────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: var(--surface-r);
+      border: 1px solid var(--border-a);
+      color: var(--text);
+      font-size: 11px;
+      padding: 7px 13px;
+      border-radius: var(--r);
+      font-family: var(--ff-m);
+      animation: toast-in .2s ease forwards;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    @keyframes toast-in {
+      from { opacity:0; transform:translateY(6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 760px) {
+      html, body { overflow: auto; }
+      .layout { grid-template-columns: 1fr; height: auto; overflow: visible; }
+      .sidebar { overflow: visible; border-right: none; border-bottom: 1px solid var(--border); }
+      .results-pane { height: auto; }
+      .results-scroll { overflow: visible; height: auto; min-height: 300px; }
+      header { padding: 0 14px; }
+      .code-pill { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="h-brand">
+      <h1 class="h-title">BMLT <em>Query</em> Client</h1>
+      <span class="h-sub">ES Module Demo</span>
+    </div>
+    <div class="h-right">
+      <div class="code-pill">import { BmltClient } from 'cdn.aws.bmlt.app/app.js'</div>
+      <div class="server-badge">
+        <span class="server-dot"></span>
+        <span>latest.aws.bmlt.app</span>
       </div>
     </div>
+  </header>
 
-    <script type="module">
-      // Import the BMLT Query Client ES Module
-      import {
-        BmltClient,
-        Weekday,
-        VenueType,
-        MeetingQueryBuilder,
-        QuickSearch,
-      } from 'https://cdn.aws.bmlt.app/app.js';
+  <div class="layout">
 
-      // Initialize the client with NYC demo server
-      const client = new BmltClient({
-        serverURL: 'https://latest.aws.bmlt.app/main_server',
-      });
+    <aside class="sidebar">
 
-      // Make utilities available globally for the demo functions
-      window.client = client;
-      window.Weekday = Weekday;
-      window.VenueType = VenueType;
-      window.MeetingQueryBuilder = MeetingQueryBuilder;
-      window.QuickSearch = QuickSearch;
+      <div class="s-section">
+        <div class="s-label">Location Search</div>
+        <div class="igroup">
+          <input type="text" id="addressInput" placeholder="Address or landmark" value="Times Square, New York, NY" />
+          <div class="radius-row">
+            <input type="number" id="radiusInput" value="2" min="0.5" max="50" step="0.5" />
+            <span class="iunit">miles radius</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="searchByAddress()">Find Nearby Meetings</button>
+      </div>
 
-      // Utility functions
-      window.setStatus = function (message, type = 'info') {
-        const statusEl = document.getElementById('status');
-        statusEl.innerHTML = `<div class="${type}">${message}</div>`;
-      };
+      <div class="s-section">
+        <div class="s-label">Filter by Day</div>
+        <div class="chip-row" id="dayFilters">
+          <button class="chip active" data-day="all"  onclick="setDayFilter(this)">All</button>
+          <button class="chip" data-day="1" onclick="setDayFilter(this)">Sun</button>
+          <button class="chip" data-day="2" onclick="setDayFilter(this)">Mon</button>
+          <button class="chip" data-day="3" onclick="setDayFilter(this)">Tue</button>
+          <button class="chip" data-day="4" onclick="setDayFilter(this)">Wed</button>
+          <button class="chip" data-day="5" onclick="setDayFilter(this)">Thu</button>
+          <button class="chip" data-day="6" onclick="setDayFilter(this)">Fri</button>
+          <button class="chip" data-day="7" onclick="setDayFilter(this)">Sat</button>
+        </div>
+      </div>
 
-      window.setResults = function (content) {
-        document.getElementById('results').innerHTML = content;
-      };
+      <div class="s-section">
+        <div class="s-label">Filter by Venue</div>
+        <div class="chip-row" id="venueFilters">
+          <button class="chip active" data-venue="all" onclick="setVenueFilter(this)">All</button>
+          <button class="chip" data-venue="1" onclick="setVenueFilter(this)">In-Person</button>
+          <button class="chip" data-venue="2" onclick="setVenueFilter(this)">Virtual</button>
+          <button class="chip" data-venue="3" onclick="setVenueFilter(this)">Hybrid</button>
+        </div>
+      </div>
 
-      window.formatMeeting = function (meeting) {
-        const venueType =
-          meeting.venue_type == 1 ? 'In-Person' : meeting.venue_type == 2 ? 'Virtual' : 'Hybrid';
-        const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][
-          parseInt(meeting.weekday_tinyint) - 1
-        ];
-        const distance = meeting.distance_in_miles
-          ? ` (${parseFloat(meeting.distance_in_miles).toFixed(1)} miles)`
+      <div class="s-section">
+        <div class="s-label">Quick Search</div>
+        <div class="btn-stack">
+          <button class="btn-ghost" onclick="searchTodaysMeetings()">Today's Meetings</button>
+          <button class="btn-ghost" onclick="searchWeekendMeetings()">This Weekend</button>
+          <button class="btn-ghost" onclick="searchVirtualMeetings()">Virtual Meetings</button>
+          <button class="btn-ghost" onclick="searchEveningMeetings()">Evening Meetings</button>
+        </div>
+      </div>
+
+      <div class="s-section">
+        <div class="s-label">Server Data</div>
+        <div class="btn-stack">
+          <button class="btn-ghost" onclick="getServerInfo()">Server Info</button>
+          <button class="btn-ghost" onclick="getFormats()">Meeting Formats</button>
+          <button class="btn-ghost" onclick="getServiceBodies()">Service Bodies</button>
+        </div>
+      </div>
+
+      <div class="s-section">
+        <div class="s-label">Geocoding</div>
+        <div class="igroup">
+          <input type="text" id="geocodeInput" placeholder="Address to geocode" value="Central Park, New York, NY" />
+        </div>
+        <button class="btn-ghost" onclick="testGeocode()">Geocode Address</button>
+      </div>
+
+    </aside>
+
+    <main class="results-pane">
+      <div class="status-bar">
+        <div class="status-msg">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Ready — select a search</span>
+        </div>
+        <span id="resultCount" class="result-count"></span>
+      </div>
+
+      <div class="results-scroll">
+        <div id="results">
+          <div class="empty-state">
+            <div class="empty-icon">◎</div>
+            <p class="empty-text">Select a search to see meetings</p>
+          </div>
+        </div>
+        <div id="loadMoreWrap" class="load-more-wrap" style="display:none">
+          <button class="btn-load-more" onclick="loadMore()">Load more</button>
+          <div class="lm-label" id="lmLabel"></div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script type="module">
+    import { BmltClient, Weekday, VenueType, MeetingQueryBuilder, QuickSearch }
+      from 'https://cdn.aws.bmlt.app/app.js';
+
+    const client = new BmltClient({ serverURL: 'https://bmlt.sezf.org/main_server' });
+
+    // ── State ──────────────────────────────────────────
+    let allMeetings    = [];
+    let displayedCount = 20;
+    const PAGE        = 20;
+    let activeDayFilter   = 'all';
+    let activeVenueFilter = 'all';
+    let isMeetingMode     = false;
+
+    // ── Day metadata (weekday_tinyint: 1=Sun … 7=Sat) ─
+    const DAYS = [
+      { name:'Sunday',    short:'SUN', color:'#c05878', bg:'rgba(192,88,120,.12)' },
+      { name:'Monday',    short:'MON', color:'#c07840', bg:'rgba(192,120,64,.12)' },
+      { name:'Tuesday',   short:'TUE', color:'#c0a840', bg:'rgba(192,168,64,.12)' },
+      { name:'Wednesday', short:'WED', color:'#4e9e72', bg:'rgba(78,158,114,.12)' },
+      { name:'Thursday',  short:'THU', color:'#4a8ec0', bg:'rgba(74,142,192,.12)' },
+      { name:'Friday',    short:'FRI', color:'#7858c0', bg:'rgba(120,88,192,.12)' },
+      { name:'Saturday',  short:'SAT', color:'#c058a0', bg:'rgba(192,88,160,.12)' },
+    ];
+
+    const VENUES = {
+      1: { label:'In-Person', cls:'ip' },
+      2: { label:'Virtual',   cls:'vrt' },
+      3: { label:'Hybrid',    cls:'hyb' },
+    };
+
+    // ── Helpers ────────────────────────────────────────
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function fmtTime(t) {
+      if (!t) return '';
+      const [h, m] = t.split(':').map(Number);
+      return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
+    }
+
+    function day(n)   { return DAYS[parseInt(n) - 1] || { name:'—', short:'?', color:'#677385', bg:'rgba(103,115,133,.1)' }; }
+    function venue(n) { return VENUES[parseInt(n)]   || { label:'Unknown', cls:'' }; }
+
+    // ── Status ─────────────────────────────────────────
+    function setStatus(msg, type = 'idle') {
+      document.getElementById('statusDot').className  = 'status-dot ' + type;
+      document.getElementById('statusText').textContent = msg;
+    }
+
+    function setCount(shown, total) {
+      const el = document.getElementById('resultCount');
+      if (total == null) { el.textContent = ''; return; }
+      el.textContent = shown === total ? `${total} result${total !== 1 ? 's' : ''}` : `${shown} of ${total}`;
+    }
+
+    // ── Skeleton ───────────────────────────────────────
+    function showSkeletons(n = 4) {
+      document.getElementById('loadMoreWrap').style.display = 'none';
+      document.getElementById('results').innerHTML = Array.from({ length: n }, () => `
+        <div class="skel-card">
+          <div style="display:flex;gap:6px;margin-bottom:9px">
+            <div class="skel-line" style="width:34px;height:17px;border-radius:100px"></div>
+            <div class="skel-line" style="width:60px;height:17px;border-radius:100px"></div>
+          </div>
+          <div class="skel-line" style="width:58%;height:13px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px">
+            <div class="skel-line" style="width:80%;height:9px"></div>
+            <div class="skel-line" style="width:70%;height:9px"></div>
+          </div>
+        </div>`).join('');
+    }
+
+    // ── Render meetings ────────────────────────────────
+    function getFiltered() {
+      let list = allMeetings;
+      if (activeDayFilter   !== 'all') list = list.filter(m => String(m.weekday_tinyint) === activeDayFilter);
+      if (activeVenueFilter !== 'all') list = list.filter(m => String(m.venue_type)       === activeVenueFilter);
+      return list;
+    }
+
+    function renderMeetings(total) {
+      const filtered = getFiltered();
+      const slice    = filtered.slice(0, displayedCount);
+      const wrap     = document.getElementById('loadMoreWrap');
+
+      if (filtered.length === 0) {
+        document.getElementById('results').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">◌</div>
+            <p class="empty-text">No meetings match these filters</p>
+          </div>`;
+        wrap.style.display = 'none';
+        setCount(0, total);
+        return;
+      }
+
+      document.getElementById('results').innerHTML = slice.map(buildCard).join('');
+      setCount(slice.length, total ?? filtered.length);
+
+      if (slice.length < filtered.length) {
+        wrap.style.display = 'block';
+        document.getElementById('lmLabel').textContent = `Showing ${slice.length} of ${filtered.length}`;
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    function buildCard(m, i) {
+      const d = day(m.weekday_tinyint);
+      const v = venue(m.venue_type);
+      const t = fmtTime(m.start_time);
+      const dist = m.distance_in_miles
+        ? `<span class="dist-badge">${parseFloat(m.distance_in_miles).toFixed(1)} mi</span>` : '';
+
+      const fmts = m.formats
+        ? m.formats.split(',').filter(Boolean).slice(0, 6)
+            .map(f => `<span class="fmt-tag">${esc(f.trim())}</span>`).join('')
+        : '';
+
+      const link = m.virtual_meeting_link
+        ? `<a href="${esc(m.virtual_meeting_link)}" target="_blank" rel="noopener" class="join-link">Join →</a>` : '';
+
+      const isVirtual = parseInt(m.venue_type) === 2;
+      const loc  = isVirtual
+        ? (m.virtual_meeting_additional_info || 'Online')
+        : (m.location_text || m.location_street || '—');
+      const city = !isVirtual && m.location_municipality
+        ? m.location_municipality + (m.location_province ? ', ' + m.location_province : '') : '';
+
+      const delay = Math.min(i * 28, 280);
+
+      return `
+        <div class="meeting-card"
+             style="--day-color:${d.color};--day-bg:${d.bg};animation-delay:${delay}ms"
+             onclick="toggleExpand(this)">
+          <div class="card-top">
+            <div class="card-badges">
+              <span class="day-badge" style="color:${d.color};background:${d.bg};border-color:${d.color}">${d.short}</span>
+              <span class="venue-badge ${v.cls}">${v.label}</span>
+              ${dist}
+            </div>
+            <button class="copy-btn"
+                    onclick="copyMeeting(event,this)"
+                    data-name="${esc(m.meeting_name)}"
+                    data-day="${d.name}" data-time="${t}"
+                    data-loc="${esc(loc)}" data-venue="${v.label}"
+                    title="Copy meeting details">⎘</button>
+          </div>
+
+          <div class="meeting-name">${esc(m.meeting_name || 'Unnamed Meeting')}</div>
+
+          <div class="card-meta">
+            <div class="meta-i">
+              <span class="meta-icon">◷</span>
+              <span class="meta-t">${d.name} · ${t}</span>
+            </div>
+            <div class="meta-i">
+              <span class="meta-icon">◍</span>
+              <span class="meta-t" title="${esc(loc)}">${esc(loc)}</span>
+            </div>
+            ${city ? `<div class="meta-i" style="grid-column:2">
+              <span class="meta-t" style="color:var(--text-d)">${esc(city)}</span>
+            </div>` : ''}
+          </div>
+
+          ${(fmts || link) ? `
+          <div class="card-foot">
+            <div class="fmt-tags">${fmts}</div>
+            ${link}
+          </div>` : ''}
+
+          <div class="card-exp">
+            <div class="exp-grid">
+              ${m.location_street ? `<div class="exp-item"><div class="exp-lbl">Street</div><div class="exp-val">${esc(m.location_street)}</div></div>` : ''}
+              ${m.location_neighborhood ? `<div class="exp-item"><div class="exp-lbl">Neighborhood</div><div class="exp-val">${esc(m.location_neighborhood)}</div></div>` : ''}
+              ${m.comments ? `<div class="exp-item" style="grid-column:1/-1"><div class="exp-lbl">Notes</div><div class="exp-val">${esc(m.comments)}</div></div>` : ''}
+              ${m.virtual_meeting_additional_info && isVirtual ? `<div class="exp-item" style="grid-column:1/-1"><div class="exp-lbl">Virtual Info</div><div class="exp-val">${esc(m.virtual_meeting_additional_info)}</div></div>` : ''}
+              ${m.contact_name_1 ? `<div class="exp-item"><div class="exp-lbl">Contact</div><div class="exp-val">${esc(m.contact_name_1)}</div></div>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Global handlers ────────────────────────────────
+    window.setDayFilter = function(btn) {
+      activeDayFilter = btn.dataset.day;
+      document.querySelectorAll('#dayFilters .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      if (isMeetingMode) { displayedCount = PAGE; renderMeetings(allMeetings.length); }
+    };
+
+    window.setVenueFilter = function(btn) {
+      activeVenueFilter = btn.dataset.venue;
+      document.querySelectorAll('#venueFilters .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      if (isMeetingMode) { displayedCount = PAGE; renderMeetings(allMeetings.length); }
+    };
+
+    window.loadMore = function() {
+      displayedCount += PAGE;
+      renderMeetings(allMeetings.length);
+    };
+
+    window.toggleExpand = function(card) { card.classList.toggle('expanded'); };
+
+    window.copyMeeting = function(e, btn) {
+      e.stopPropagation();
+      const { name, day, time, loc, venue } = btn.dataset;
+      navigator.clipboard.writeText(`${name}\n${day} at ${time}\n${loc}\n${venue}`)
+        .then(() => toast('Copied to clipboard'));
+    };
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }
+
+    function beginMeetingSearch() {
+      isMeetingMode     = true;
+      displayedCount    = PAGE;
+    }
+
+    // ── Search functions ───────────────────────────────
+    window.searchByAddress = async function() {
+      const address = document.getElementById('addressInput').value.trim();
+      const radius  = parseFloat(document.getElementById('radiusInput').value);
+      if (!address) { setStatus('Enter an address to search', 'error'); return; }
+
+      beginMeetingSearch();
+      setStatus('Searching near ' + address + '…', 'loading');
+      showSkeletons();
+
+      try {
+        allMeetings = await client.searchMeetingsByAddress({
+          address, radiusMiles: radius, sortByDistance: true,
+          searchParams: { page_size: 100 },
+        });
+        renderMeetings(allMeetings.length);
+        setStatus(
+          allMeetings.length
+            ? `${allMeetings.length} meetings near "${address}"`
+            : `No meetings within ${radius} mi of "${address}"`,
+          allMeetings.length ? 'success' : 'error'
+        );
+      } catch (err) {
+        console.error(err);
+        setStatus('Error: ' + err.message, 'error');
+        document.getElementById('results').innerHTML =
+          '<div class="empty-state"><p class="empty-text">Search failed. Check console.</p></div>';
+      }
+    };
+
+    window.searchVirtualMeetings = async function() {
+      beginMeetingSearch();
+      setStatus('Loading virtual meetings…', 'loading');
+      showSkeletons();
+      try {
+        allMeetings = await client.searchMeetings({ venue_types: VenueType.VIRTUAL, page_size: 80 });
+        renderMeetings(allMeetings.length);
+        setStatus(`${allMeetings.length} virtual meetings`, allMeetings.length ? 'success' : 'error');
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.searchTodaysMeetings = async function() {
+      beginMeetingSearch();
+      setStatus("Loading today's meetings…", 'loading');
+      showSkeletons();
+      try {
+        allMeetings = await new QuickSearch(client).today().paginate(80, 1).execute();
+        renderMeetings(allMeetings.length);
+        setStatus(`${allMeetings.length} meetings today`, allMeetings.length ? 'success' : 'error');
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.searchWeekendMeetings = async function() {
+      beginMeetingSearch();
+      setStatus('Loading weekend meetings…', 'loading');
+      showSkeletons();
+      try {
+        allMeetings = await new QuickSearch(client).weekend().paginate(80, 1).execute();
+        renderMeetings(allMeetings.length);
+        setStatus(`${allMeetings.length} weekend meetings`, allMeetings.length ? 'success' : 'error');
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.searchEveningMeetings = async function() {
+      beginMeetingSearch();
+      setStatus('Loading evening meetings…', 'loading');
+      showSkeletons();
+      try {
+        allMeetings = await new QuickSearch(client).evening().paginate(80, 1).execute();
+        renderMeetings(allMeetings.length);
+        setStatus(`${allMeetings.length} evening meetings`, allMeetings.length ? 'success' : 'error');
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.getServerInfo = async function() {
+      isMeetingMode = false;
+      setStatus('Fetching server info…', 'loading');
+      showSkeletons(2);
+      try {
+        const info = await client.getServerInfo();
+        const d = Array.isArray(info) ? info[0] : info;
+        document.getElementById('results').innerHTML = `
+          <div class="data-card">
+            <div class="data-title">Server Information</div>
+            <div class="data-meta">
+              <div><span style="color:var(--text-d)">URL</span> &nbsp; ${esc(client.getServerURL())}</div>
+              <div><span style="color:var(--text-d)">Version</span> &nbsp; ${esc(d?.version ?? '—')}</div>
+            </div>
+            <pre class="data-pre">${esc(JSON.stringify(d, null, 2))}</pre>
+          </div>`;
+        setStatus('Server info loaded', 'success');
+        setCount(null, null);
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.getFormats = async function() {
+      isMeetingMode = false;
+      setStatus('Fetching formats…', 'loading');
+      showSkeletons(3);
+      try {
+        const formats = await client.getFormats();
+        document.getElementById('results').innerHTML = formats.map((f, i) => `
+          <div class="data-card" style="animation-delay:${i * 18}ms;opacity:0;animation-fill-mode:forwards">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span class="data-tag">${esc(f.key_string)}</span>
+              <span class="data-title" style="margin:0">${esc(f.name_string)}</span>
+            </div>
+            <div class="data-meta">${esc(f.description_string || 'No description')}</div>
+          </div>`).join('');
+        setStatus(`${formats.length} formats`, 'success');
+        setCount(formats.length, formats.length);
+        document.getElementById('loadMoreWrap').style.display = 'none';
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.getServiceBodies = async function() {
+      isMeetingMode = false;
+      setStatus('Fetching service bodies…', 'loading');
+      showSkeletons(3);
+      try {
+        const bodies = await client.getServiceBodies();
+        document.getElementById('results').innerHTML = bodies.map((sb, i) => `
+          <div class="data-card" style="animation-delay:${i * 18}ms;opacity:0;animation-fill-mode:forwards">
+            <div class="data-title">${esc(sb.name)}</div>
+            <div class="data-meta">
+              <div><span style="color:var(--text-d)">Type</span> &nbsp; ${esc(sb.type)} &nbsp;&nbsp;
+                   <span style="color:var(--text-d)">ID</span> &nbsp; ${sb.id}</div>
+              ${sb.description ? `<div style="margin-top:4px">${esc(sb.description)}</div>` : ''}
+              ${sb.url ? `<div style="margin-top:4px"><a href="${esc(sb.url)}" target="_blank" style="color:var(--info)">${esc(sb.url)}</a></div>` : ''}
+            </div>
+          </div>`).join('');
+        setStatus(`${bodies.length} service bodies`, 'success');
+        setCount(bodies.length, bodies.length);
+        document.getElementById('loadMoreWrap').style.display = 'none';
+      } catch (err) { setStatus('Error: ' + err.message, 'error'); }
+    };
+
+    window.testGeocode = async function() {
+      const address = document.getElementById('geocodeInput').value.trim();
+      if (!address) { setStatus('Enter an address to geocode', 'error'); return; }
+      isMeetingMode = false;
+      setStatus('Geocoding…', 'loading');
+      showSkeletons(1);
+      try {
+        const r = await client.geocodeAddress(address);
+        const addrLines = r.address
+          ? Object.entries(r.address).filter(([,v]) => v)
+              .map(([k,v]) => `<div><span style="color:var(--text-d)">${esc(k)}</span> &nbsp; ${esc(String(v))}</div>`).join('')
           : '';
+        document.getElementById('results').innerHTML = `
+          <div class="data-card">
+            <div class="data-title">${esc(r.display_name)}</div>
+            <div class="data-meta">
+              <div><span style="color:var(--text-d)">Coordinates</span> &nbsp;
+                ${r.coordinates.latitude.toFixed(6)}, ${r.coordinates.longitude.toFixed(6)}</div>
+              ${r.confidence ? `<div><span style="color:var(--text-d)">Confidence</span> &nbsp; ${(r.confidence * 100).toFixed(1)}%</div>` : ''}
+              ${addrLines ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-s)">${addrLines}</div>` : ''}
+            </div>
+          </div>`;
+        setStatus('Geocoded successfully', 'success');
+        setCount(null, null);
+        document.getElementById('loadMoreWrap').style.display = 'none';
+      } catch (err) {
+        setStatus('Geocoding failed: ' + err.message, 'error');
+        document.getElementById('results').innerHTML =
+          '<div class="empty-state"><p class="empty-text">Address not found or service unavailable</p></div>';
+      }
+    };
 
-        return `
-                <div class="meeting">
-                    <h4>${meeting.meeting_name}${distance}</h4>
-                    <div class="meeting-info">
-                        📅 ${dayName} at ${meeting.start_time}<br>
-                        📍 ${meeting.location_text}<br>
-                        🏢 ${venueType}<br>
-                        ${meeting.virtual_meeting_link ? `🔗 <a href="${meeting.virtual_meeting_link}" target="_blank">Join Virtual Meeting</a><br>` : ''}
-                        ${meeting.comments ? `💬 ${meeting.comments}<br>` : ''}
-                    </div>
-                </div>
-            `;
-      };
+    // ── Init ───────────────────────────────────────────
+    setStatus('Ready — select a search', 'idle');
+    console.log('BMLT Query Client loaded');
+  </script>
 
-      // Search functions (all in the ES module context for async/await support)
-      window.searchByAddress = async function () {
-        const address = document.getElementById('addressInput').value;
-        const radius = parseFloat(document.getElementById('radiusInput').value);
-
-        if (!address.trim()) {
-          setStatus('❌ Please enter an address', 'error');
-          return;
-        }
-
-        setStatus('🔍 Searching for meetings near ' + address + '...', 'loading');
-
-        try {
-          const meetings = await client.searchMeetingsByAddress({
-            address: address,
-            radiusMiles: radius,
-            sortByDistance: true,
-            searchParams: { page_size: 10 },
-          });
-
-          if (meetings.length === 0) {
-            setResults(
-              '<p>No meetings found in this area. Try a different location or larger radius.</p>'
-            );
-            setStatus(`🤷 No meetings found near "${address}" within ${radius} miles`, 'error');
-          } else {
-            const html = meetings.map(formatMeeting).join('');
-            setResults(html);
-            setStatus(`✅ Found ${meetings.length} meetings near "${address}"`, 'success');
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-          setResults('<p>Search failed. Check console for details.</p>');
-        }
-      };
-
-      window.searchVirtualMeetings = async function () {
-        setStatus('🔍 Searching for virtual meetings...', 'loading');
-
-        try {
-          const meetings = await client.searchMeetings({
-            venue_types: VenueType.VIRTUAL,
-            page_size: 15,
-          });
-
-          if (meetings.length === 0) {
-            setResults('<p>No virtual meetings found.</p>');
-            setStatus('🤷 No virtual meetings found', 'error');
-          } else {
-            const html = meetings.map(formatMeeting).join('');
-            setResults(html);
-            setStatus(`✅ Found ${meetings.length} virtual meetings`, 'success');
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.searchTodaysMeetings = async function () {
-        setStatus("🔍 Searching for today's meetings...", 'loading');
-
-        try {
-          const quickSearch = new QuickSearch(client);
-          const meetings = await quickSearch.today().paginate(15, 1).execute();
-
-          if (meetings.length === 0) {
-            setResults('<p>No meetings found for today.</p>');
-            setStatus('🤷 No meetings found for today', 'error');
-          } else {
-            const html = meetings.map(formatMeeting).join('');
-            setResults(html);
-            setStatus(`✅ Found ${meetings.length} meetings for today`, 'success');
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.searchWeekendMeetings = async function () {
-        setStatus('🔍 Searching for weekend meetings...', 'loading');
-
-        try {
-          const quickSearch = new QuickSearch(client);
-          const meetings = await quickSearch.weekend().paginate(15, 1).execute();
-
-          if (meetings.length === 0) {
-            setResults('<p>No weekend meetings found.</p>');
-            setStatus('🤷 No weekend meetings found', 'error');
-          } else {
-            const html = meetings.map(formatMeeting).join('');
-            setResults(html);
-            setStatus(`✅ Found ${meetings.length} weekend meetings`, 'success');
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.searchEveningMeetings = async function () {
-        setStatus('🔍 Searching for evening meetings...', 'loading');
-
-        try {
-          const quickSearch = new QuickSearch(client);
-          const meetings = await quickSearch.evening().paginate(15, 1).execute();
-
-          if (meetings.length === 0) {
-            setResults('<p>No evening meetings found.</p>');
-            setStatus('🤷 No evening meetings found', 'error');
-          } else {
-            const html = meetings.map(formatMeeting).join('');
-            setResults(html);
-            setStatus(`✅ Found ${meetings.length} evening meetings`, 'success');
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.getServerInfo = async function () {
-        setStatus('🔍 Getting server information...', 'loading');
-
-        try {
-          const serverInfo = await client.getServerInfo();
-
-          let html = '<h3>🖥️ Server Information</h3>';
-          if (Array.isArray(serverInfo)) {
-            const info = serverInfo[0];
-            html += `
-                        <p><strong>Version:</strong> ${info.version}</p>
-                        <p><strong>Server:</strong> ${client.getServerURL()}</p>
-                        <div class="stats">Raw response: ${JSON.stringify(info, null, 2)}</div>
-                    `;
-          } else {
-            html += `<pre>${JSON.stringify(serverInfo, null, 2)}</pre>`;
-          }
-
-          setResults(html);
-          setStatus('✅ Server information retrieved', 'success');
-        } catch (error) {
-          console.error('Server info error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.getFormats = async function () {
-        setStatus('🔍 Getting meeting formats...', 'loading');
-
-        try {
-          const formats = await client.getFormats();
-
-          let html = '<h3>📋 Meeting Formats</h3>';
-          formats.slice(0, 10).forEach(format => {
-            html += `
-                        <div class="meeting">
-                            <h4>${format.key_string} - ${format.name_string}</h4>
-                            <div class="meeting-info">${format.description_string || 'No description available'}</div>
-                        </div>
-                    `;
-          });
-
-          if (formats.length > 10) {
-            html += `<p><em>Showing first 10 of ${formats.length} formats</em></p>`;
-          }
-
-          setResults(html);
-          setStatus(`✅ Found ${formats.length} meeting formats`, 'success');
-        } catch (error) {
-          console.error('Formats error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.getServiceBodies = async function () {
-        setStatus('🔍 Getting service bodies...', 'loading');
-
-        try {
-          const serviceBodies = await client.getServiceBodies();
-
-          let html = '<h3>🏛️ Service Bodies</h3>';
-          serviceBodies.forEach(sb => {
-            html += `
-                        <div class="meeting">
-                            <h4>${sb.name}</h4>
-                            <div class="meeting-info">
-                                Type: ${sb.type}<br>
-                                ${sb.description ? `Description: ${sb.description}<br>` : ''}
-                                ${sb.url ? `URL: <a href="${sb.url}" target="_blank">${sb.url}</a><br>` : ''}
-                                ID: ${sb.id}
-                            </div>
-                        </div>
-                    `;
-          });
-
-          setResults(html);
-          setStatus(`✅ Found ${serviceBodies.length} service bodies`, 'success');
-        } catch (error) {
-          console.error('Service bodies error:', error);
-          setStatus('❌ Error: ' + error.message, 'error');
-        }
-      };
-
-      window.testGeocode = async function () {
-        const address = document.getElementById('geocodeInput').value;
-
-        if (!address.trim()) {
-          setStatus('❌ Please enter an address to geocode', 'error');
-          return;
-        }
-
-        setStatus('🌍 Geocoding address: ' + address + '...', 'loading');
-
-        try {
-          const result = await client.geocodeAddress(address);
-
-          const html = `
-                    <h3>🌍 Geocoding Result</h3>
-                    <div class="meeting">
-                        <h4>📍 ${result.display_name}</h4>
-                        <div class="meeting-info">
-                            <strong>Coordinates:</strong> ${result.coordinates.latitude.toFixed(6)}, ${result.coordinates.longitude.toFixed(6)}<br>
-                            ${result.confidence ? `<strong>Confidence:</strong> ${(result.confidence * 100).toFixed(1)}%<br>` : ''}
-                            ${
-                              result.address
-                                ? `
-                                <strong>Address Components:</strong><br>
-                                ${Object.entries(result.address)
-                                  .filter(([key, value]) => value)
-                                  .map(([key, value]) => `${key}: ${value}`)
-                                  .join('<br>')}
-                            `
-                                : ''
-                            }
-                        </div>
-                    </div>
-                    <p><em>🇺🇸 Using US region bias (default)</em></p>
-                `;
-
-          setResults(html);
-          setStatus('✅ Address geocoded successfully', 'success');
-        } catch (error) {
-          console.error('Geocoding error:', error);
-          setStatus('❌ Geocoding failed: ' + error.message, 'error');
-          setResults(
-            '<p>Geocoding failed. Address may not be found or service may be unavailable.</p>'
-          );
-        }
-      };
-
-      console.log('BMLT Query Client ES Module loaded successfully!');
-      setStatus('✅ BMLT Query Client ES Module initialized and ready!', 'success');
-    </script>
-
-    <!-- All functions are now defined in the ES module script above -->
-  </body>
+</body>
 </html>
