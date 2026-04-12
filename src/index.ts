@@ -14,6 +14,7 @@ export type { NominatimResponse } from './services/geocoding';
 // Utilities
 export * from './utils/url-builder';
 export * from './utils/errors';
+export * from './utils/meetings';
 
 // Type definitions
 export * from './types';

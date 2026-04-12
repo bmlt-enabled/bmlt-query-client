@@ -183,6 +183,38 @@ const todaysVirtualMeetings = await quickSearch
   .execute();
 ```
 
+### Finding Duplicate Meetings
+
+When querying meetings from multiple service bodies or servers, use `findDuplicateMeetings` to identify the same meeting appearing in more than one list:
+
+```javascript
+import { findDuplicateMeetings } from 'bmlt-query-client';
+
+const [listA, listB] = await Promise.all([
+  client.searchMeetings({ services: [1] }),
+  client.searchMeetings({ services: [2] }),
+]);
+
+const duplicates = findDuplicateMeetings([listA, listB]);
+
+for (const group of duplicates) {
+  console.log(`Duplicate: ${group.key}`);
+  for (const { meeting, listIndex } of group.entries) {
+    console.log(`  List ${listIndex}: id=${meeting.id_bigint}`);
+  }
+}
+```
+
+By default, meetings are compared on `weekday_tinyint`, `start_time`, `meeting_name`, and `location_text` (case-insensitive). You can customize the fields:
+
+```javascript
+// Compare only on name and street address
+const duplicates = findDuplicateMeetings([listA, listB], {
+  fields: ['meeting_name', 'location_street'],
+  normalize: true, // lowercase + trim (default)
+});
+```
+
 ## Error Handling
 
 The client provides comprehensive error handling with specific error types:
