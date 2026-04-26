@@ -95,3 +95,29 @@ export function findDuplicateMeetings(
 
   return result;
 }
+
+/**
+ * Count unique groups across a list of meetings.
+ *
+ * A "group" is identified by the combination of service body and meeting name
+ * (case-insensitive, trimmed), so multiple weekly meetings of the same group
+ * count once.
+ */
+export function countUniqueGroups(meetings: Meeting[]): number {
+  const namesByServiceBody = new Map<string, Set<string>>();
+
+  for (const { service_body_bigint: sbId, meeting_name: name } of meetings) {
+    if (!sbId || !name) continue;
+    const normalized = name.trim().toLowerCase();
+    if (!namesByServiceBody.has(sbId)) {
+      namesByServiceBody.set(sbId, new Set());
+    }
+    namesByServiceBody.get(sbId)!.add(normalized);
+  }
+
+  let total = 0;
+  for (const names of namesByServiceBody.values()) {
+    total += names.size;
+  }
+  return total;
+}

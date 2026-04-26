@@ -215,6 +215,18 @@ const duplicates = findDuplicateMeetings([listA, listB], {
 });
 ```
 
+### Counting Unique Groups
+
+Use `countUniqueGroups` to get the total number of distinct groups in a meeting list. A group is identified by its service body plus meeting name (case-insensitive, trimmed), so multiple weekly occurrences of the same group count once:
+
+```javascript
+import { countUniqueGroups } from 'bmlt-query-client';
+
+const meetings = await client.searchMeetings();
+const total = countUniqueGroups(meetings);
+console.log(`Total unique groups: ${total}`);
+```
+
 ## Error Handling
 
 The client provides comprehensive error handling with specific error types:
