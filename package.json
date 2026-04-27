@@ -1,6 +1,6 @@
 {
   "name": "bmlt-query-client",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "A TypeScript client for querying BMLT (Basic Meeting List Tool) servers with built-in geocoding support",
   "type": "module",
   "main": "dist/app.js",
