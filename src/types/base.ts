@@ -46,15 +46,17 @@ export enum SortKey {
 }
 
 export enum Language {
-  ENGLISH = 'en',
+  DANISH = 'da',
   GERMAN = 'de',
-  DANISH = 'dk',
+  GREEK = 'el',
+  ENGLISH = 'en',
   SPANISH = 'es',
   PERSIAN = 'fa',
   FRENCH = 'fr',
   ITALIAN = 'it',
   POLISH = 'pl',
   PORTUGUESE = 'pt',
+  RUSSIAN = 'ru',
   SWEDISH = 'sv',
 }
 
