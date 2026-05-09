@@ -71,7 +71,7 @@ describe('BMLT Query Client - Basic Tests', () => {
 
     expect(Array.isArray(virtualMeetings)).toBe(true);
     virtualMeetings.forEach(meeting => {
-      expect(meeting.venue_type).toBe(VenueType.VIRTUAL);
+      expect(parseInt(meeting.venue_type.toString())).toBe(VenueType.VIRTUAL);
     });
   });
 
