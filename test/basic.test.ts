@@ -262,6 +262,28 @@ describe('BMLT Query Client - Basic Tests', () => {
     }).toThrow('Latitude must be between -90 and 90 degrees');
   });
 
+  test('should search with multiple meeting_key_value entries', async () => {
+    const meetings = await client.searchMeetings({
+      venue_types: VenueType.VIRTUAL,
+      meeting_key: 'weekday_tinyint',
+      meeting_key_value: ['2', '3'], // Monday and Tuesday
+      page_size: 10,
+    });
+    expect(Array.isArray(meetings)).toBe(true);
+  });
+
+  test('rawQuery should accept bare endpoint shorthand', async () => {
+    const meetings = await client.rawQuery<unknown[]>('GetSearchResults&page_size=5');
+    expect(Array.isArray(meetings)).toBe(true);
+    expect(meetings.length).toBeLessThanOrEqual(5);
+  });
+
+  test('rawQuery should accept explicit switcher= form', async () => {
+    const meetings = await client.rawQuery<unknown[]>('switcher=GetSearchResults&page_size=5');
+    expect(Array.isArray(meetings)).toBe(true);
+    expect(meetings.length).toBeLessThanOrEqual(5);
+  });
+
   test('should handle user agent configuration', () => {
     // Test getting default user agent
     expect(client.getUserAgent()).toBe('bmlt-query-client/1.0.0');

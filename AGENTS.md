@@ -97,6 +97,20 @@ Key rules:
 4. Export any new public types from `src/types/index.ts` and any new public classes/functions from `src/index.ts`.
 5. Add a usage example in `examples/basic-usage.ts`.
 6. Add or extend a test in `test/basic.test.ts`.
+7. Update `CHANGELOG.md` under `[Unreleased]`.
+
+## Raw Query
+
+`BmltClient.rawQuery<T>(queryString, format?)` sends a raw BMLT query string directly to the server. The first token is treated as the switcher value when it has no `=` sign:
+
+- `'GetSearchResults&venue_types=2'` → `switcher=GetSearchResults&venue_types=2`
+- `'switcher=GetSearchResults&venue_types=2'` → passed through unchanged
+
+The internal HTTP fetch+parse logic lives in the private `fetchAndParse` method shared with `makeRequest`. Do not duplicate it.
+
+## Array Parameters
+
+`meeting_key_value` in `SearchResultsParams` accepts `string | string[]`. The URL builder serialises arrays as repeated `key[]=value` entries (e.g. `meeting_key_value[]=USA&meeting_key_value[]=US`). This same pattern applies to all other array-typed parameters (`weekdays`, `venue_types`, `formats`, `services`, `root_server_ids`, `meeting_ids`).
 
 ## Geocoding
 

@@ -206,6 +206,28 @@
         margin-bottom: 8px;
       }
 
+      textarea {
+        width: 100%;
+        padding: 7px 10px;
+        background: var(--surface-r);
+        border: 1px solid var(--border);
+        border-radius: var(--rs);
+        color: var(--text);
+        font-family: var(--ff-m);
+        font-size: 11px;
+        outline: none;
+        transition: border-color var(--t);
+        resize: vertical;
+        min-height: 72px;
+        line-height: 1.5;
+      }
+      textarea::placeholder {
+        color: var(--text-d);
+      }
+      textarea:focus {
+        border-color: var(--accent);
+      }
+
       input[type='text'],
       input[type='number'] {
         width: 100%;
@@ -898,6 +920,17 @@
         </div>
 
         <div class="s-section">
+          <div class="s-label">Raw Query</div>
+          <div class="igroup">
+            <textarea
+              id="rawQueryInput"
+              placeholder="GetSearchResults&amp;venue_types=2&amp;meeting_key=location_nation&amp;meeting_key_value[]=USA&amp;meeting_key_value[]=US"
+            ></textarea>
+          </div>
+          <button class="btn-primary" onclick="runRawQuery()">Run Query</button>
+        </div>
+
+        <div class="s-section">
           <div class="s-label">Geocoding</div>
           <div class="igroup">
             <input
@@ -1449,6 +1482,61 @@
           setStatus('Geocoding failed: ' + err.message, 'error');
           document.getElementById('results').innerHTML =
             '<div class="empty-state"><p class="empty-text">Address not found or service unavailable</p></div>';
+        }
+      };
+
+      window.runRawQuery = async function () {
+        const qs = document.getElementById('rawQueryInput').value.trim();
+        if (!qs) {
+          setStatus('Enter a query string', 'error');
+          return;
+        }
+        setStatus('Running raw query…', 'loading');
+        showSkeletons();
+        try {
+          const result = await client.rawQuery(qs);
+
+          // meetings array
+          if (Array.isArray(result) && result.length > 0 && result[0].meeting_name != null) {
+            isMeetingMode = true;
+            displayedCount = PAGE;
+            allMeetings = result;
+            renderMeetings(allMeetings.length);
+            setStatus(`${allMeetings.length} meetings returned`, 'success');
+            return;
+          }
+
+          // meetings+formats envelope from get_used_formats=1
+          if (result && Array.isArray(result.meetings)) {
+            isMeetingMode = true;
+            displayedCount = PAGE;
+            allMeetings = result.meetings;
+            renderMeetings(allMeetings.length);
+            setStatus(
+              `${allMeetings.length} meetings · ${result.formats?.length ?? 0} formats`,
+              'success'
+            );
+            return;
+          }
+
+          // anything else — render as JSON
+          isMeetingMode = false;
+          const items = Array.isArray(result) ? result : [result];
+          document.getElementById('results').innerHTML = items
+            .map(
+              (item, i) => `
+            <div class="data-card" style="animation-delay:${i * 18}ms;opacity:0;animation-fill-mode:forwards">
+              <pre class="data-pre">${jsonHL(item)}</pre>
+            </div>`
+            )
+            .join('');
+          setCount(items.length, items.length);
+          document.getElementById('loadMoreWrap').style.display = 'none';
+          setStatus(`${items.length} result${items.length !== 1 ? 's' : ''}`, 'success');
+        } catch (err) {
+          setStatus('Error: ' + err.message, 'error');
+          document.getElementById('results').innerHTML =
+            '<div class="empty-state"><p class="empty-text">Query failed. Check console.</p></div>';
         }
       };
 

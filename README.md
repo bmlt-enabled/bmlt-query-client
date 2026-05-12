@@ -183,6 +183,44 @@ const todaysVirtualMeetings = await quickSearch
   .execute();
 ```
 
+### Raw Query
+
+When you need to pass a BMLT query string exactly as-is — including parameters like `meeting_key_value[]` that match multiple values — use `rawQuery`:
+
+```javascript
+// Bare endpoint shorthand (most common)
+const meetings = await client.rawQuery(
+  'GetSearchResults&venue_types=2&meeting_key=location_nation&meeting_key_value[]=USA&meeting_key_value[]=US'
+);
+
+// Explicit switcher= form also works
+const meetings2 = await client.rawQuery('switcher=GetSearchResults&page_size=10');
+
+// With get_used_formats — returns { meetings, formats }
+import type { MeetingsWithFormats } from 'bmlt-query-client';
+
+const result = await client.rawQuery<MeetingsWithFormats>(
+  'GetSearchResults&get_used_formats=1&venue_types=2'
+);
+```
+
+Multi-value `meeting_key_value` is also available through the typed API:
+
+```javascript
+// Typed params — array serialises as meeting_key_value[]=USA&meeting_key_value[]=US
+const meetings = await client.searchMeetings({
+  venue_types: VenueType.IN_PERSON,
+  meeting_key: 'location_nation',
+  meeting_key_value: ['USA', 'US'],
+});
+
+// Or via query builder
+const meetings2 = await new MeetingQueryBuilder(client)
+  .inPersonOnly()
+  .fieldValue('location_nation', ['USA', 'US'])
+  .execute();
+```
+
 ### Finding Duplicate Meetings
 
 When querying meetings from multiple service bodies or servers, use `findDuplicateMeetings` to identify the same meeting appearing in more than one list:

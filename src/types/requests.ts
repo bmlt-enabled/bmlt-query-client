@@ -98,8 +98,8 @@ export interface SearchResultsParams extends BaseSearchParams {
   /** Search for specific field value */
   meeting_key?: string;
 
-  /** The value to search for */
-  meeting_key_value?: string;
+  /** The value to search for; pass an array to match any of multiple values */
+  meeting_key_value?: string | string[];
 
   /** Return only specific fields (comma-separated) */
   data_field_key?: string;

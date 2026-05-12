@@ -86,45 +86,29 @@ export class BmltClient {
   }
 
   /**
-   * Make a request to the BMLT API
+   * Fetch a URL and parse the response according to format
    */
-  private async makeRequest<T>(
-    endpoint: BmltEndpoint,
-    parameters: Record<string, unknown> = {},
-    format: BmltDataFormat = this.defaultFormat
+  private async fetchAndParse<T>(
+    url: string,
+    format: BmltDataFormat,
+    parameters: Record<string, unknown> = {}
   ): Promise<T> {
     let response: Response | undefined;
 
     try {
-      // Validate endpoint/format combination
-      validateEndpointFormat(endpoint, format);
-
-      // Build the request URL
-      const url = buildBmltURL({
-        serverURL: this.serverURL,
-        format,
-        endpoint,
-        parameters,
-      });
-
-      // Create abort controller for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
       try {
-        // Make the request
         response = await fetch(url, {
           method: 'GET',
-          headers: {
-            'User-Agent': this.userAgent,
-          },
+          headers: { 'User-Agent': this.userAgent },
           signal: controller.signal,
         });
       } finally {
         clearTimeout(timeoutId);
       }
 
-      // Check if response is ok
       if (!response.ok) {
         throw ErrorHandler.handleFetchError(
           new Error(`HTTP ${response.status}: ${response.statusText}`),
@@ -132,37 +116,64 @@ export class BmltClient {
         );
       }
 
-      // Get response text
       const responseText = await response.text();
 
-      // Handle CSV responses
-      if (format === BmltDataFormat.CSV) {
-        return responseText as T;
-      }
+      if (format === BmltDataFormat.CSV) return responseText as T;
 
-      // Handle JSONP responses
       if (format === BmltDataFormat.JSONP) {
-        // Extract JSON from JSONP callback
         const callbackName = (parameters.callback as string) || 'callback';
         const jsonMatch = responseText.match(new RegExp(`${callbackName}\\((.+)\\);?$`));
-
-        if (!jsonMatch) {
-          throw new Error('Invalid JSONP response format');
-        }
-
+        if (!jsonMatch) throw new Error('Invalid JSONP response format');
         return JSON.parse(jsonMatch[1]) as T;
       }
 
-      // Handle JSON and TSML responses
       if (format === BmltDataFormat.JSON || format === BmltDataFormat.TSML) {
         return JSON.parse(responseText) as T;
       }
 
-      // Fallback - return as text
       return responseText as T;
     } catch (error) {
       throw ErrorHandler.handleFetchError(error, response);
     }
+  }
+
+  /**
+   * Make a request to the BMLT API
+   */
+  private async makeRequest<T>(
+    endpoint: BmltEndpoint,
+    parameters: Record<string, unknown> = {},
+    format: BmltDataFormat = this.defaultFormat
+  ): Promise<T> {
+    validateEndpointFormat(endpoint, format);
+    const url = buildBmltURL({ serverURL: this.serverURL, format, endpoint, parameters });
+    return this.fetchAndParse<T>(url, format, parameters);
+  }
+
+  /**
+   * Execute a raw BMLT query string against the server.
+   *
+   * Pass the query exactly as you'd append it to a BMLT URL.  The switcher
+   * can be written with or without the key name:
+   *
+   *   // bare endpoint name — most common shorthand
+   *   client.rawQuery('GetSearchResults&venue_types=2&meeting_key=location_nation&meeting_key_value[]=USA&meeting_key_value[]=US')
+   *
+   *   // explicit switcher= key also works
+   *   client.rawQuery('switcher=GetSearchResults&venue_types=2')
+   */
+  async rawQuery<T = unknown>(
+    queryString: string,
+    format: BmltDataFormat = this.defaultFormat
+  ): Promise<T> {
+    const baseURL = this.serverURL.endsWith('/') ? this.serverURL : `${this.serverURL}/`;
+    const endpointURL = `${baseURL}client_interface/${format}/`;
+
+    // If the first token has no '=' it is a bare endpoint name; prepend switcher=
+    const firstSegment = queryString.split('&')[0];
+    const normalized = firstSegment.includes('=') ? queryString : `switcher=${queryString}`;
+
+    return this.fetchAndParse<T>(`${endpointURL}?${normalized}`, format);
   }
 
   /**

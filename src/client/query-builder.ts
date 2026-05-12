@@ -211,9 +211,9 @@ export class MeetingQueryBuilder {
   }
 
   /**
-   * Search for specific field value
+   * Search for specific field value; pass an array to match any of multiple values
    */
-  fieldValue(fieldKey: string, value: string): this {
+  fieldValue(fieldKey: string, value: string | string[]): this {
     this.params.meeting_key = fieldKey;
     this.params.meeting_key_value = value;
     return this;
