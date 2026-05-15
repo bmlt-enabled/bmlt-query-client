@@ -65,7 +65,7 @@ describe('BMLT Query Client - Basic Tests', () => {
 
     expect(Array.isArray(virtualMeetings)).toBe(true);
     virtualMeetings.forEach(meeting => {
-      expect(parseInt(meeting.venue_type.toString())).toBe(VenueType.VIRTUAL);
+      expect(meeting.venue_type).toBe(VenueType.VIRTUAL);
     });
   });
 
@@ -77,7 +77,7 @@ describe('BMLT Query Client - Basic Tests', () => {
 
     expect(Array.isArray(mondayMeetings)).toBe(true);
     mondayMeetings.forEach(meeting => {
-      expect(parseInt(meeting.weekday_tinyint.toString())).toBe(Weekday.MONDAY);
+      expect(meeting.weekday_tinyint).toBe(Weekday.MONDAY);
     });
   });
 
@@ -101,7 +101,7 @@ describe('BMLT Query Client - Basic Tests', () => {
     expect(Array.isArray(meetings)).toBe(true);
     meetings.forEach(meeting => {
       expect(meeting.distance_in_miles).toBeDefined();
-      expect(parseFloat(meeting.distance_in_miles?.toString() || '0')).toBeLessThanOrEqual(2);
+      expect(meeting.distance_in_miles ?? 0).toBeLessThanOrEqual(2);
     });
   });
 
@@ -116,7 +116,7 @@ describe('BMLT Query Client - Basic Tests', () => {
     expect(Array.isArray(meetings)).toBe(true);
     meetings.forEach(meeting => {
       expect(meeting.distance_in_miles).toBeDefined();
-      expect(parseFloat(meeting.distance_in_miles?.toString() || '0')).toBeLessThanOrEqual(1);
+      expect(meeting.distance_in_miles ?? 0).toBeLessThanOrEqual(1);
     });
   });
 

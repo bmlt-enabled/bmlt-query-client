@@ -35,6 +35,7 @@ import {
   validateRadius,
 } from '../utils/url-builder';
 import { ErrorHandler } from '../utils/errors';
+import { transformMeeting, transformServerInfo, transformCoverageArea } from '../utils/transforms';
 
 export interface BmltClientOptions {
   /** Server URL */
@@ -181,7 +182,12 @@ export class BmltClient {
    */
   async searchMeetings(params: SearchResultsParams = {}): Promise<Meeting[]> {
     const { format = this.defaultFormat, ...searchParams } = params;
-    return this.makeRequest<Meeting[]>(BmltEndpoint.GET_SEARCH_RESULTS, searchParams, format);
+    const result = await this.makeRequest<unknown[]>(
+      BmltEndpoint.GET_SEARCH_RESULTS,
+      searchParams,
+      format
+    );
+    return result.map(transformMeeting);
   }
 
   /**
@@ -197,11 +203,15 @@ export class BmltClient {
     params: Omit<SearchResultsParams, 'get_used_formats' | 'get_formats_only'> = {}
   ): Promise<MeetingsWithFormats> {
     const { format = this.defaultFormat, ...searchParams } = params;
-    return this.makeRequest<MeetingsWithFormats>(
+    const result = await this.makeRequest<{ meetings: unknown[]; formats: Format[] }>(
       BmltEndpoint.GET_SEARCH_RESULTS,
       { ...searchParams, get_used_formats: true },
       format
     );
+    return {
+      meetings: result.meetings.map(transformMeeting),
+      formats: result.formats,
+    };
   }
 
   /**
@@ -319,16 +329,16 @@ export class BmltClient {
    * Get server information
    */
   async getServerInfo(): Promise<ServerInfo> {
-    const result = await this.makeRequest<ServerInfo[]>(BmltEndpoint.GET_SERVER_INFO);
-    return result[0];
+    const result = await this.makeRequest<unknown[]>(BmltEndpoint.GET_SERVER_INFO);
+    return transformServerInfo(result[0]);
   }
 
   /**
    * Get server coverage area
    */
   async getCoverageArea(): Promise<CoverageArea> {
-    const result = await this.makeRequest<CoverageArea[]>(BmltEndpoint.GET_COVERAGE_AREA);
-    return result[0];
+    const result = await this.makeRequest<unknown[]>(BmltEndpoint.GET_COVERAGE_AREA);
+    return transformCoverageArea(result[0]);
   }
 
   /**

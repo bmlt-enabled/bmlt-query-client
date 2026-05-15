@@ -8,11 +8,11 @@ export interface Meeting {
   /** Meeting ID */
   id_bigint: string;
 
-  /** Weekday (1-7) as a numeric string */
-  weekday_tinyint: string;
+  /** Weekday (1=Sunday, 7=Saturday) */
+  weekday_tinyint: number;
 
-  /** Venue type (1=In-person, 2=Virtual, 3=Hybrid) as a numeric string */
-  venue_type: string;
+  /** Venue type (1=In-person, 2=Virtual, 3=Hybrid) */
+  venue_type: number;
 
   /** Start time (24-hour format HH:MM:SS) */
   start_time: string;
@@ -56,14 +56,14 @@ export interface Meeting {
   /** Location nation */
   location_nation?: string;
 
-  /** Latitude as a numeric string */
-  latitude: string;
+  /** Latitude */
+  latitude: number;
 
-  /** Longitude as a numeric string */
-  longitude: string;
+  /** Longitude */
+  longitude: number;
 
-  /** Published status (0=unpublished, 1=published) as a numeric string */
-  published: string;
+  /** Published status (0=unpublished, 1=published) */
+  published: number;
 
   /** Email contact */
   email_contact?: string;
@@ -131,11 +131,11 @@ export interface Meeting {
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
 
-  /** Distance from search point in km as a numeric string (when using geographic search; may be empty string otherwise) */
-  distance_in_km?: string;
+  /** Distance from search point in km (undefined when not a geographic search) */
+  distance_in_km?: number;
 
-  /** Distance from search point in miles as a numeric string (when using geographic search; may be empty string otherwise) */
-  distance_in_miles?: string;
+  /** Distance from search point in miles (undefined when not a geographic search) */
+  distance_in_miles?: number;
 }
 
 export interface Format {
@@ -238,8 +238,8 @@ export interface ServerInfo {
   /** Server version (e.g. "4.2.0") */
   version: string;
 
-  /** Server version as integer string (e.g. "4002000") */
-  versionInt: string;
+  /** Server version as integer (e.g. 4002000) */
+  versionInt: number;
 
   /** Supported languages, comma-separated (e.g. "da,de,el,en,es") */
   langs: string;
@@ -247,14 +247,14 @@ export interface ServerInfo {
   /** Native language code (e.g. "en") */
   nativeLang: string;
 
-  /** Map center longitude as a numeric string */
-  centerLongitude: string;
+  /** Map center longitude */
+  centerLongitude: number;
 
-  /** Map center latitude as a numeric string */
-  centerLatitude: string;
+  /** Map center latitude */
+  centerLatitude: number;
 
-  /** Default map zoom level as a numeric string */
-  centerZoom: string;
+  /** Default map zoom level */
+  centerZoom: number;
 
   /** Default meeting duration (HH:MM:SS) */
   defaultDuration: string;
@@ -268,11 +268,11 @@ export interface ServerInfo {
   /** Distance units ("mi" or "km") */
   distanceUnits: string;
 
-  /** Semantic admin enabled flag as a numeric string ("0" or "1") */
-  semanticAdmin: string;
+  /** Semantic admin enabled flag (0 or 1) */
+  semanticAdmin: number;
 
-  /** Number of changes tracked per meeting as a numeric string */
-  changesPerMeeting: string;
+  /** Number of changes tracked per meeting */
+  changesPerMeeting: number;
 
   /** Comma-separated list of states/provinces with meetings */
   meeting_states_and_provinces: string;
@@ -315,17 +315,17 @@ export interface ServerInfo {
 }
 
 export interface CoverageArea {
-  /** Northwest corner longitude as a numeric string */
-  nw_corner_longitude: string;
+  /** Northwest corner longitude */
+  nw_corner_longitude: number;
 
-  /** Northwest corner latitude as a numeric string */
-  nw_corner_latitude: string;
+  /** Northwest corner latitude */
+  nw_corner_latitude: number;
 
-  /** Southeast corner longitude as a numeric string */
-  se_corner_longitude: string;
+  /** Southeast corner longitude */
+  se_corner_longitude: number;
 
-  /** Southeast corner latitude as a numeric string */
-  se_corner_latitude: string;
+  /** Southeast corner latitude */
+  se_corner_latitude: number;
 }
 
 export interface FieldKey {

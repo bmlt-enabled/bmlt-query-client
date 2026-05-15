@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-05-15
+
+### Added
+
+- Response transforms applied inside `searchMeetings`, `searchMeetingsByAddress`, `searchMeetingsByCoordinates`, `searchMeetingsWithFormats`, `getServerInfo`, and `getCoverageArea`. BMLT serializes numeric fields as quoted strings; the client now coerces them to real `number` values so consumers get idiomatic types without needing to parse manually.
+
+### Changed
+
+- **Breaking:** `Meeting` numeric fields are now typed and returned as `number` (were `string` in 1.3.0): `weekday_tinyint`, `venue_type`, `published`, `latitude`, `longitude`.
+- **Breaking:** `Meeting.distance_in_km` and `Meeting.distance_in_miles` are `number | undefined` (were `string | undefined`); the transform maps the empty strings BMLT returns for non-geographic searches to `undefined`.
+- **Breaking:** `ServerInfo` numeric fields are now `number` (were `string`): `versionInt`, `centerLongitude`, `centerLatitude`, `centerZoom`, `semanticAdmin`, `changesPerMeeting`.
+- **Breaking:** `CoverageArea` corner fields are now `number` (were `string`): `nw_corner_longitude`, `nw_corner_latitude`, `se_corner_longitude`, `se_corner_latitude`.
+
 ## [1.3.0] - 2026-05-15
 
 ### Added
@@ -72,7 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Zero external runtime dependencies — p-queue and p-retry are bundled via Vite.
 - ES module only; native `fetch` API; TypeScript declarations included.
 
-[Unreleased]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.0.6...v1.1.0
