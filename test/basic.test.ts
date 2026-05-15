@@ -14,13 +14,7 @@ describe('BMLT Query Client - Basic Tests', () => {
   test('should get server info', async () => {
     const serverInfo = await client.getServerInfo();
     expect(serverInfo).toBeDefined();
-    // API returns an array, check the first element
-    if (Array.isArray(serverInfo)) {
-      expect(serverInfo.length).toBeGreaterThan(0);
-      expect(serverInfo[0]).toHaveProperty('version');
-    } else {
-      expect(serverInfo).toHaveProperty('version');
-    }
+    expect(serverInfo).toHaveProperty('version');
   });
 
   test('should get meeting formats', async () => {

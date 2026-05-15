@@ -319,14 +319,16 @@ export class BmltClient {
    * Get server information
    */
   async getServerInfo(): Promise<ServerInfo> {
-    return this.makeRequest<ServerInfo>(BmltEndpoint.GET_SERVER_INFO);
+    const result = await this.makeRequest<ServerInfo[]>(BmltEndpoint.GET_SERVER_INFO);
+    return result[0];
   }
 
   /**
    * Get server coverage area
    */
   async getCoverageArea(): Promise<CoverageArea> {
-    return this.makeRequest<CoverageArea>(BmltEndpoint.GET_COVERAGE_AREA);
+    const result = await this.makeRequest<CoverageArea[]>(BmltEndpoint.GET_COVERAGE_AREA);
+    return result[0];
   }
 
   /**

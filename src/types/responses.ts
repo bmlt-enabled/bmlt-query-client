@@ -8,11 +8,11 @@ export interface Meeting {
   /** Meeting ID */
   id_bigint: string;
 
-  /** Weekday (1-7) */
-  weekday_tinyint: number;
+  /** Weekday (1-7) as a numeric string */
+  weekday_tinyint: string;
 
-  /** Venue type (1=In-person, 2=Virtual, 3=Hybrid) */
-  venue_type: number;
+  /** Venue type (1=In-person, 2=Virtual, 3=Hybrid) as a numeric string */
+  venue_type: string;
 
   /** Start time (24-hour format HH:MM:SS) */
   start_time: string;
@@ -56,14 +56,14 @@ export interface Meeting {
   /** Location nation */
   location_nation?: string;
 
-  /** Latitude */
-  latitude: number;
+  /** Latitude as a numeric string */
+  latitude: string;
 
-  /** Longitude */
-  longitude: number;
+  /** Longitude as a numeric string */
+  longitude: string;
 
-  /** Published status (0=unpublished, 1=published) */
-  published: number;
+  /** Published status (0=unpublished, 1=published) as a numeric string */
+  published: string;
 
   /** Email contact */
   email_contact?: string;
@@ -77,8 +77,17 @@ export interface Meeting {
   /** Service body Name */
   service_body_name?: string;
 
+  /** Shared group ID */
+  shared_group_id_bigint?: string;
+
+  /** Meeting formats (comma-separated format key strings, e.g. "O,D,NS,FD") */
+  formats: string;
+
   /** Meeting formats (comma-separated format IDs) */
   format_shared_id_list?: string;
+
+  /** Language enum (e.g. "en") */
+  lang_enum?: string;
 
   /** Meeting comments */
   comments?: string;
@@ -89,14 +98,44 @@ export interface Meeting {
   /** Virtual meeting additional info */
   virtual_meeting_additional_info?: string;
 
+  /** Phone meeting number (may be empty string) */
+  phone_meeting_number: string;
+
+  /** Bus lines serving the meeting location (may be empty string) */
+  bus_lines: string;
+
+  /** Train lines serving the meeting location (may be empty string) */
+  train_lines: string;
+
+  /** Primary contact name (only returned to authenticated admins) */
+  contact_name_1?: string;
+
+  /** Secondary contact name (only returned to authenticated admins) */
+  contact_name_2?: string;
+
+  /** Primary contact phone (only returned to authenticated admins) */
+  contact_phone_1?: string;
+
+  /** Secondary contact phone (only returned to authenticated admins) */
+  contact_phone_2?: string;
+
+  /** Primary contact email (only returned to authenticated admins) */
+  contact_email_1?: string;
+
+  /** Secondary contact email (only returned to authenticated admins) */
+  contact_email_2?: string;
+
+  /** Admin notes (only returned to authenticated admins) */
+  admin_notes?: string;
+
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
 
-  /** Distance from search point (when using geographic search) */
-  distance_in_km?: number;
+  /** Distance from search point in km as a numeric string (when using geographic search; may be empty string otherwise) */
+  distance_in_km?: string;
 
-  /** Distance in miles from search point */
-  distance_in_miles?: number;
+  /** Distance from search point in miles as a numeric string (when using geographic search; may be empty string otherwise) */
+  distance_in_miles?: string;
 }
 
 export interface Format {
@@ -115,11 +154,11 @@ export interface Format {
   /** Language */
   lang: string;
 
-  /** World format ID */
-  world_id?: string;
+  /** World format ID (may be empty string) */
+  world_id: string;
 
-  /** Format type enum */
-  format_type_enum?: string;
+  /** Format type enum (may be empty string) */
+  format_type_enum: string;
 
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
@@ -132,23 +171,23 @@ export interface ServiceBody {
   /** Service body name */
   name: string;
 
-  /** Service body description */
-  description?: string;
+  /** Service body description (may be empty string) */
+  description: string;
 
   /** Service body type */
   type: string;
 
-  /** Service body URL */
-  url?: string;
+  /** Service body URL (may be empty string) */
+  url: string;
 
-  /** Help line */
-  helpline?: string;
+  /** Help line (may be empty string) */
+  helpline: string;
 
-  /** World service committee code */
-  world_id?: string;
+  /** World service committee code (may be empty string) */
+  world_id: string;
 
-  /** Parent service body ID */
-  parent_id?: string;
+  /** Parent service body ID ("0" for root service bodies) */
+  parent_id: string;
 
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
@@ -196,43 +235,97 @@ export interface Change {
 }
 
 export interface ServerInfo {
-  /** Server version */
+  /** Server version (e.g. "4.2.0") */
   version: string;
 
-  /** Available endpoints */
-  availableEndpoints: string[];
+  /** Server version as integer string (e.g. "4002000") */
+  versionInt: string;
 
-  /** Supported formats */
-  supportedFormats: string[];
+  /** Supported languages, comma-separated (e.g. "da,de,el,en,es") */
+  langs: string;
 
-  /** Supported languages */
-  langs: string[];
-
-  /** Native language */
+  /** Native language code (e.g. "en") */
   nativeLang: string;
 
-  /** Server name */
-  name?: string;
+  /** Map center longitude as a numeric string */
+  centerLongitude: string;
 
-  /** Server description */
-  description?: string;
+  /** Map center latitude as a numeric string */
+  centerLatitude: string;
 
-  /** Coverage area information */
-  coverageArea?: CoverageArea;
+  /** Default map zoom level as a numeric string */
+  centerZoom: string;
+
+  /** Default meeting duration (HH:MM:SS) */
+  defaultDuration: string;
+
+  /** Region bias for geocoding (e.g. "us") */
+  regionBias: string;
+
+  /** Character set (e.g. "UTF-8") */
+  charSet: string;
+
+  /** Distance units ("mi" or "km") */
+  distanceUnits: string;
+
+  /** Semantic admin enabled flag as a numeric string ("0" or "1") */
+  semanticAdmin: string;
+
+  /** Number of changes tracked per meeting as a numeric string */
+  changesPerMeeting: string;
+
+  /** Comma-separated list of states/provinces with meetings */
+  meeting_states_and_provinces: string;
+
+  /** Comma-separated list of counties/sub-provinces with meetings */
+  meeting_counties_and_sub_provinces: string;
+
+  /** Comma-separated list of meeting fields available in search results */
+  available_keys: string;
+
+  /** Google Maps API key */
+  google_api_key: string;
+
+  /** Database migration version */
+  dbVersion: string;
+
+  /** Database table prefix */
+  dbPrefix: string;
+
+  /** PHP version running on the server */
+  phpVersion: string;
+
+  /** Whether automatic geocoding is enabled */
+  auto_geocoding_enabled: boolean;
+
+  /** Whether county auto-geocoding is enabled */
+  county_auto_geocoding_enabled: boolean;
+
+  /** Whether ZIP auto-geocoding is enabled */
+  zip_auto_geocoding_enabled: boolean;
+
+  /** Git commit hash of the server build */
+  commit: string;
+
+  /** Whether new meetings default to closed status */
+  default_closed_status: boolean;
+
+  /** Whether aggregator mode is enabled */
+  aggregator_mode_enabled: boolean;
 }
 
 export interface CoverageArea {
-  /** North boundary */
-  north_latitude: number;
+  /** Northwest corner longitude as a numeric string */
+  nw_corner_longitude: string;
 
-  /** South boundary */
-  south_latitude: number;
+  /** Northwest corner latitude as a numeric string */
+  nw_corner_latitude: string;
 
-  /** East boundary */
-  east_longitude: number;
+  /** Southeast corner longitude as a numeric string */
+  se_corner_longitude: string;
 
-  /** West boundary */
-  west_longitude: number;
+  /** Southeast corner latitude as a numeric string */
+  se_corner_latitude: string;
 }
 
 export interface FieldKey {
