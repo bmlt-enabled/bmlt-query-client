@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-05-15
+
+### Fixed
+
+- Republish of 1.4.0 with regenerated `dist/` files. The 1.4.0 npm tarball shipped stale type declarations (`dist/app.d.ts` was baked from a 1.3.0-era build), so TypeScript consumers still saw the old `string` types for `Meeting.weekday_tinyint`, `latitude`, `longitude`, etc. — even though the source had been updated to `number`. No source changes; this release just ensures `dist/` matches `src/`.
+- Added a `prepublishOnly` script (`npm run clean && npm run build`) so future publishes always ship a fresh build.
+
 ## [1.4.0] - 2026-05-15
 
 ### Added
@@ -85,7 +92,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Zero external runtime dependencies — p-queue and p-retry are bundled via Vite.
 - ES module only; native `fetch` API; TypeScript declarations included.
 
-[Unreleased]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.1.0...v1.2.0
