@@ -99,25 +99,32 @@ export function findDuplicateMeetings(
 /**
  * Count unique groups across a list of meetings.
  *
- * A "group" is identified by the combination of service body and meeting name
- * (case-insensitive, trimmed), so multiple weekly meetings of the same group
- * count once.
+ * A "group" is identified by the combination of service body, meeting name
+ * (case-insensitive, trimmed), and meeting location — physical coordinates
+ * for in-person/hybrid (venue_type !== 2), or the virtual meeting link plus
+ * additional info for virtual (venue_type === 2). Multiple weekly meetings of
+ * the same group count once; two distinct groups that happen to share a name
+ * but meet at different locations count separately. Matches the long-standing
+ * "group_id" definition used by crouton.
+ *
+ * Meetings missing a service body or name are skipped.
  */
 export function countUniqueGroups(meetings: Meeting[]): number {
-  const namesByServiceBody = new Map<string, Set<string>>();
+  const seen = new Set<string>();
 
-  for (const { service_body_bigint: sbId, meeting_name: name } of meetings) {
+  for (const meeting of meetings) {
+    const sbId = meeting.service_body_bigint;
+    const name = meeting.meeting_name;
     if (!sbId || !name) continue;
-    const normalized = name.trim().toLowerCase();
-    if (!namesByServiceBody.has(sbId)) {
-      namesByServiceBody.set(sbId, new Set());
-    }
-    namesByServiceBody.get(sbId)!.add(normalized);
+
+    const normalizedName = name.trim().toLowerCase();
+    const location =
+      meeting.venue_type === 2
+        ? `${meeting.virtual_meeting_link ?? ''}|${meeting.virtual_meeting_additional_info ?? ''}`
+        : `${meeting.latitude.toFixed(6)}|${meeting.longitude.toFixed(6)}`;
+
+    seen.add(`${sbId}|${normalizedName}|${location}`);
   }
 
-  let total = 0;
-  for (const names of namesByServiceBody.values()) {
-    total += names.size;
-  }
-  return total;
+  return seen.size;
 }

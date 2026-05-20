@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-05-19
+
+### Fixed
+
+- `countUniqueGroups` now matches crouton's long-standing definition: groups are identified by `(service_body, normalized meeting name, location)` — physical coordinates for in-person/hybrid (`venue_type !== 2`), virtual link + additional info for virtual (`venue_type === 2`). The previous algorithm keyed only on `(service_body, name)`, which under-counted whenever two distinct home groups happened to share a name but met at different locations (real-world example: MCANA returned 12 groups vs. crouton's 17 for the same 30 meetings). Bug; widget headers and downstream callers now agree with crouton.
+
 ## [1.4.1] - 2026-05-15
 
 ### Fixed
@@ -92,7 +98,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Zero external runtime dependencies — p-queue and p-retry are bundled via Vite.
 - ES module only; native `fetch` API; TypeScript declarations included.
 
-[Unreleased]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/bmlt-enabled/bmlt-query-client/compare/v1.2.0...v1.3.0
