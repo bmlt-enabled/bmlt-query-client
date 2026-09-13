@@ -252,6 +252,28 @@ export class MeetingQueryBuilder {
   }
 
   /**
+   * Order results by each meeting's next upcoming start as an absolute instant
+   * ("starting soonest" across timezones). Optionally pass a grace window in
+   * minutes so recently-started meetings still sort near the top.
+   * Aggregator-mode only — ignored on ordinary root servers.
+   */
+  sortByNextStart(graceMinutes?: number): this {
+    this.params.sort_results_by_next_start = true;
+    if (graceMinutes !== undefined) this.params.next_start_grace_minutes = graceMinutes;
+    return this;
+  }
+
+  /**
+   * Evaluate weekday/time-of-day filters against each meeting's next occurrence
+   * in the given IANA time zone (e.g. `'America/New_York'`).
+   * Aggregator-mode only — ignored on ordinary root servers.
+   */
+  targetTimeZone(tz: string): this {
+    this.params.target_time_zone = tz;
+    return this;
+  }
+
+  /**
    * Set pagination
    */
   paginate(pageSize: number, pageNumber = 1): this {
@@ -445,6 +467,18 @@ export class QuickSearch {
    */
   inPerson(): MeetingQueryBuilder {
     return new MeetingQueryBuilder(this.client).inPersonOnly();
+  }
+
+  /**
+   * Find virtual + hybrid meetings ordered by which starts soonest across
+   * timezones. Pass the reader's IANA time zone (e.g. from
+   * `Intl.DateTimeFormat().resolvedOptions().timeZone`) to reckon any further
+   * weekday/time filters in their local zone. Aggregator-mode only — on
+   * ordinary root servers the ordering params are ignored.
+   */
+  virtualSoonest(tz?: string): MeetingQueryBuilder {
+    const builder = new MeetingQueryBuilder(this.client).virtualOrHybrid().sortByNextStart();
+    return tz ? builder.targetTimeZone(tz) : builder;
   }
 
   /**

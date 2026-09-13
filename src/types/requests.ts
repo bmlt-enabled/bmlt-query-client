@@ -95,6 +95,29 @@ export interface SearchResultsParams extends BaseSearchParams {
   /** Sort results by distance when using geographic search */
   sort_results_by_distance?: boolean;
 
+  /**
+   * Order results by each meeting's next upcoming start as an absolute instant
+   * (timezone-aware "starting soonest"), built for virtual meetings spanning
+   * timezones. Aggregator-mode only — ignored on ordinary root servers.
+   */
+  sort_results_by_next_start?: boolean;
+
+  /**
+   * Minutes (0–1440) to shift the "now" reference backward when using
+   * {@link sort_results_by_next_start}, so recently-started / in-progress
+   * meetings still sort near the top. Aggregator-mode only.
+   */
+  next_start_grace_minutes?: number;
+
+  /**
+   * IANA time zone (e.g. `'America/New_York'`) the reader is in. When set, the
+   * `weekdays` and start/end time-of-day filters are evaluated against each
+   * meeting's next occurrence converted into this zone. Aggregator-mode only —
+   * ignored on ordinary root servers. Note: this does not change the returned
+   * `start_time`/`weekday_tinyint`, which remain the meeting's native values.
+   */
+  target_time_zone?: string;
+
   /** Search for specific field value */
   meeting_key?: string;
 

@@ -183,6 +183,27 @@ const todaysVirtualMeetings = await quickSearch
   .execute();
 ```
 
+### Virtual Meetings ("starting soonest")
+
+On an aggregator (`aggregator_mode_enabled`), the server can order virtual/hybrid
+meetings by whichever starts soonest across every timezone — handy for a
+"what can I join right now?" list. `QuickSearch.virtualSoonest(tz)` wires this up:
+
+```javascript
+const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; // e.g. 'America/New_York'
+
+const result = await new QuickSearch(client)
+  .virtualSoonest(tz) // venue_types=[2,3] + sort_results_by_next_start + target_time_zone
+  .sortByNextStart(15) // optional: keep meetings that started ≤15 min ago near the top
+  .executeWithFormats();
+```
+
+These ordering params are **aggregator-mode only** — ordinary root servers ignore
+`sort_results_by_next_start`, `next_start_grace_minutes`, and `target_time_zone`,
+returning the venue-filtered meetings in their usual order. `target_time_zone`
+affects only filtering/ordering; each meeting's `start_time`/`weekday_tinyint`
+still come back in its own local time, so convert client-side for display.
+
 ### Raw Query
 
 When you need to pass a BMLT query string exactly as-is — including parameters like `meeting_key_value[]` that match multiple values — use `rawQuery`:
