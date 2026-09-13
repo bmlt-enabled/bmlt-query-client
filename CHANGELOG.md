@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-13
+
+### Added
+
+- Virtual-meeting ordering params on `SearchResultsParams`, mirroring the BMLT aggregator's timezone-aware "starting soonest" support: `sort_results_by_next_start` (order by each meeting's next occurrence as an absolute instant), `next_start_grace_minutes` (keep recently-started meetings sorting high), and `target_time_zone` (evaluate weekday/time-of-day filters in the reader's IANA zone). All three are aggregator-mode only and ignored on ordinary root servers.
+- Fluent builder helpers `MeetingQueryBuilder.sortByNextStart(graceMinutes?)` and `.targetTimeZone(tz)`, plus `QuickSearch.virtualSoonest(tz?)` (virtual + hybrid, ordered soonest-first).
+
 ## [1.4.2] - 2026-05-19
 
 ### Fixed
