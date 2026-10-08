@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-08
+
+### Added
+
+- `Meeting.source_id` (optional number): the meeting's ID on its own root server, returned by the aggregator (BMLT Server 4.2.9+). `id_bigint` is the aggregator's own ID there, so use `source_id` when linking back to the source server (e.g. a meeting update form). Can be requested via `data_field_key`.
+- `ServiceBody.meeting_update_url` (optional string): the service body's meeting update form URL, returned by `GetServiceBodies` on BMLT Server 4.2.9+ (empty string when unset).
+
 ## [1.5.0] - 2026-09-13
 
 ### Added

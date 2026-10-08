@@ -131,6 +131,12 @@ export interface Meeting {
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
 
+  /**
+   * The meeting's ID on its own root server (aggregator mode only, BMLT Server 4.2.9+).
+   * `id_bigint` is the aggregator's ID; use this when linking back to the source server.
+   */
+  source_id?: number;
+
   /** Distance from search point in km (undefined when not a geographic search) */
   distance_in_km?: number;
 
@@ -188,6 +194,9 @@ export interface ServiceBody {
 
   /** Parent service body ID ("0" for root service bodies) */
   parent_id: string;
+
+  /** Meeting update form URL, e.g. a BMLT Workflow page (BMLT Server 4.2.9+; empty string when unset) */
+  meeting_update_url?: string;
 
   /** Root server URI (for aggregator mode) */
   root_server_uri?: string;
